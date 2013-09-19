@@ -27,10 +27,13 @@ function Queue()
     
     this.dequeue = function() {
         var retVal = null;
+        
         if (this.q.length > 0)
         {
+        	console.log(this.q);
             retVal = this.q.shift();
         }
+        console.log(retVal);
         return retVal;        
     };
     

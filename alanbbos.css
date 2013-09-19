@@ -1,11 +1,29 @@
 /* alanbbos.css */
+@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro|Source+Code+Pro);  
+@import url(http://fonts.googleapis.com/css?family=Lato:100,300,400); 
 
 body {
-   background: #909193 url(images/linen.png) repeat;
-   font-family: Helvetica, Verdana, Arial, sans-serif;
+	background-color: #f0f0f0;
+	font-family: Helvetica, Verdana, Arial, sans-serif;
 	font-size: 12pt;
 	font-weight: normal;
 	font-style: normal;
+	padding: 0;
+	margin: 0;
+	border: 0;
+}
+
+header {
+	width: 100%;
+	background-color: #329ED8; /*#EE7836;*/
+	height: 80px;
+	padding: 0;
+	margin: 0;
+	border: 0;
+}
+
+header #logo {
+	margin: 30px 0 0 30px;
 }
 
 h1 {
@@ -36,13 +54,78 @@ h3 {
 	cursor: default;
 }
 
-.normal_button {
-	width: 100px;
-}
-
 .footerText {
    color: black;
    font-family: Arial, Helvetica, sans-serif;
-	font-size: 8pt;
+   font-size: 8pt;
    text-align: center;
+}
+
+#divConsole {
+	/*opacity: 0.5;*/
+}
+
+#divButtonBar
+{
+	float: right;
+	
+}
+#divButtonBar input
+{
+	/*opacity: 0.35;*/
+	margin-right: 35px;
+	width: 12%;
+	height: 12%;
+}
+
+#divButtonBar input:last-child
+{
+	margin: 0;
+}
+
+#clock {
+	font-family: 'Lato', sans-serif;
+	font-weight: 300;
+	font-size: 46px;
+	line-height: 45px;
+}
+
+#date
+{
+	font-family: 'Lato', sans-serif;
+	font-weight: 300;
+	font-size: 15px;
+	text-align: center;
+	clear: both;
+}
+
+#date,
+#clock
+{
+	float: right;
+}
+
+#status
+{
+	float: left;
+	font-family: 'Lato', sans-serif;
+	font-weight: 300;
+	font-size: 48px;
+}
+
+#clock,
+#date,
+#status
+{
+	color: #FFFFFF;
+	padding: 0;
+	margin: 0;
+}
+
+#taskBar
+{
+	float: right;
+}
+#divButtonBar {
+	margin: 4px;
 }

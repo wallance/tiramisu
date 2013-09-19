@@ -15,6 +15,7 @@ function CLIconsole() {
     this.CurrentYPosition = _DefaultFontSize;
     this.buffer = "";
     
+    
     // Methods
     this.init = function() {
        this.clearScreen();
@@ -31,10 +32,12 @@ function CLIconsole() {
     };
 
     this.handleInput = function() {
+    
        while (_KernelInputQueue.getSize() > 0)
        {
            // Get the next character from the kernel input queue.
            var chr = _KernelInputQueue.dequeue();
+           
            // Check to see if it's "special" (enter or ctrl-c) or "normal" (anything else that the keyboard device driver gave us).
            if (chr == String.fromCharCode(13))  //     Enter key
            {
@@ -43,6 +46,25 @@ function CLIconsole() {
                _OsShell.handleInput(this.buffer);
                // ... and reset our buffer.
                this.buffer = "";
+           }
+           // Backspace buffer by one character, when text has been entered
+           else if ((chr == String.fromCharCode(8)) && (this.buffer.length > 0))
+           {
+           		console.log("Remove from char has been executed"); 
+           		
+           		this.removeLastCharacter();
+           		
+           		/*var positionOfCharToRemove = this.buffer.length - 1;
+           		console.log(positionOfCharToRemove);
+           		
+           		
+           		// From console
+           		this.removeChar(this.buffer.charAt(positionOfCharToRemove));   
+           		
+           		// From buffer
+           		this.buffer = this.buffer.slice(0, positionOfCharToRemove);
+           		console.log(this.buffer);*/
+           		       		
            }
            // TODO: Write a case for Ctrl-C.
            else
@@ -66,15 +88,120 @@ function CLIconsole() {
        {
            // Draw the text at the current X and Y coordinates.
            _DrawingContext.drawText(this.CurrentFont, this.CurrentFontSize, this.CurrentXPosition, this.CurrentYPosition, text);
-         // Move the current X position.
-           var offset = _DrawingContext.measureText(this.CurrentFont, this.CurrentFontSize, text);
-           this.CurrentXPosition = this.CurrentXPosition + offset;
+         	
+         	// Move the current X position.
+			var offset = _DrawingContext.measureText(this.CurrentFont, this.CurrentFontSize, text);
+			this.CurrentXPosition = this.CurrentXPosition + offset;
+           
        }
     };
 
     this.advanceLine = function() {
        this.CurrentXPosition = 0;
        this.CurrentYPosition += _DefaultFontSize + _FontHeightMargin;
-       // TODO: Handle scrolling.
+       
+       // Scroll the canvas in the Y position exceeds the canvas height
+       if (this.CurrentYPosition >= _Canvas.height)
+       {
+       		this.scrollCanvasUp();
+       };  
     };
+    
+    // Moves the canvas contents upward.
+    this.scrollCanvasUp = function()
+    {
+    	// Determine how many lines to adjust the console text.
+		var scrollOffset = _DefaultFontSize + _FontHeightMargin;
+		
+		// Now, adjust the Y position appropriately.
+		this.CurrentYPosition = this.CurrentYPosition - scrollOffset;
+		
+		// Shift the image of the canvas upward.
+		var canvasImageToBeShifted = _DrawingContext.getImageData(0, scrollOffset, _Canvas.width, _Canvas.height - scrollOffset);
+		
+		// Redraw the old canvas image in it's new position by placing
+		//  it at the top of the canvas.
+		_DrawingContext.putImageData(canvasImageToBeShifted, 0, 0);
+		
+		// Now, clear the area where the old data used to be.
+		_DrawingContext.clearRect(0, _Canvas.height - scrollOffset, _Canvas.width, scrollOffset);
+    };
+    
+    // Removes the last character from both the console and the buffer
+    this.removeLastCharacter = function()
+    {
+    	// It would be a good idea to just measure the last character and erase it.
+    	// However, it is easier to delete the entire line and redraw it, less the last
+    	// character.
+    	var oldBuffer = this.buffer;
+    	
+		// Remove the last character
+		var newBuffer = oldBuffer.substring(0, oldBuffer.length - 1);
+		
+		// Save the new buffer
+		this.buffer = newBuffer;
+		
+		// Let's determine where we should start when redrawing and
+		// where we should stop when removing the text.  Remember, the OS Shell
+		// prompt string is a variable.
+		var beginXOffset = _DrawingContext.measureText(this.CurrentFont, this.CurrentFontSize, _OsShell.promptStr);
+	
+		// Determine the size of the text in the old buffer contents
+		var oldBufferTextSize = _DrawingContext.measureText(this.CurrentFont, this.CurrentFontSize, oldBuffer);
+		
+		// Delete all the text on the canvas
+		var offsetY = this.CurrentYPosition - this.CurrentFontSize;
+		_DrawingContext.clearRect(beginXOffset, offsetY, oldBufferTextSize, (this.CurrentFontSize + _FontHeightMargin));
+		
+		// Redraw the new buffer contents on the canvas
+		// Note, we don't want to overwrite the prompt character, so we need to offset it
+		_DrawingContext.drawText(this.CurrentFont, this.CurrentFontSize, beginXOffset, this.CurrentYPosition, newBuffer);
+		
+		// Now that the character is removed, set we need to update the
+		// appropriate positions.  Make sure we don't forget about the OS Shell prompt!
+		var offset = _DrawingContext.measureText(this.CurrentFont, this.CurrentFontSize, newBuffer);
+		this.CurrentXPosition = beginXOffset + offset;
+    }
+    this.removeLastCharacter3 = function()
+    {
+    	var deletedChar = this.buffer.slice(-1);
+    	var startX = this.CurrentXPosition - _DrawingContext.measureText(this.CurrentFont, this.CurrentFontSize, deletedChar),
+            startY = this.CurrentYPosition - _DefaultFontSize - 2;
+        // Trim the buffer
+        this.buffer = this.buffer.substring(0, this.buffer.length - 1);
+        // Draw a rectangle over the letter that was deleted
+        _DrawingContext.clearRect(startX, startY, this.CurrentXPosition, this.CurrentYPosition + 2);
+        // Move the current X position since we've removed a character
+        this.CurrentXPosition -= _DrawingContext.measureText(this.CurrentFont, this.CurrentFontSize, deletedChar);
+    }
+    this.removeLastCharacter2 = function()
+    {	
+    	// Get the last character
+    	var lastCharacter = this.buffer.slice(-1);
+    	
+    	// Modify the buffer
+    	var slicedBuffer = this.buffer.substring(0, this.buffer.length - 1);
+		
+		// Calculate the coordinates of the character to be removed
+		var oldCharX = this.CurrentXPosition - _DrawingContext.measureText(this.CurrentFont, this.CurrentFontSize, lastCharacter);
+		var oldCharY = this.CurrentYPosition - _DefaultFontSize -2;
+    	
+    	var offset = this.CurrentFontSize + _FontHeightMargin;
+    	
+    	var startingXPosition = 12.48;
+    	
+		
+		// Remove the desired character
+		_DrawingContext.clearRect(oldCharX, oldCharY, this.CurrentXPosition, this.CurrentYPosition + 6);
+		
+		// Draw the modifiedBuffer at the starting X and Y coordinates.
+        //_DrawingContext.drawText(this.CurrentFont, this.CurrentFontSize, startingXPosition, this.CurrentYPosition, this.buffer);
+        
+		// Set the offset equal to the x and y coordinate where the previous character was
+		var offset = _DrawingContext.measureText(this.CurrentFont, this.CurrentFontSize, this.buffer);
+		
+        // Start new text input at the end of the "backspaced line" and add in the width of the shell prompt '>'
+		this.CurrentXPosition = oldCharX;
+		
+    }
 }

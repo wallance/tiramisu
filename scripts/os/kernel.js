@@ -48,6 +48,8 @@ function krnBootstrap()      // Page 8.
    krnTrace("Creating and Launching the shell.");
    _OsShell = new Shell();
    _OsShell.init();
+   
+   _TaskBar.setStatus("Running");
 
    // Finally, initiate testing.
    if (_GLaDOS) {
@@ -66,6 +68,8 @@ function krnShutdown()
     // Unload the Device Drivers?
     // More?
     //
+    _TaskBar.stopClock();
+    document.getElementById("player").pause();
     krnTrace("end shutdown OS");
 }
 
@@ -185,6 +189,21 @@ function krnTrace(msg)
 function krnTrapError(msg)
 {
     hostLog("OS ERROR - TRAP: " + msg);
-    // TODO: Display error on console, perhaps in some sort of colored screen. (Perhaps blue?)
+    _DrawingContext.fillStyle = '#000000';
+    _DrawingContext.fillRect(0, 0, _Canvas.width, _Canvas.height);
+    _DrawingContext.fillStyle = '#008000';
+    _DrawingContext.font = "13px 'Source Code Pro'";
+    _DrawingContext.textBaseline = 'top';
     krnShutdown();
+    var maxPos = _Canvas.width - 10;
+    var message = "System Failure";
+    for (var i=10; i <= _Canvas.height; i = i + 17)
+    {
+    	
+    	_DrawingContext.fillText("System FailureSystem FailureSystem FailureSystem FailureSystem Failure", 10, i);
+    }
+    clearInterval(_hardwareClockID);
+    //document.getElementById("player").pause();
+    hostBtnHaltOS_click(false);
+    
 }

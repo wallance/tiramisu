@@ -26,6 +26,8 @@ function hostInit()
 
 	// Get a global reference to the drawing context.
 	_DrawingContext = _Canvas.getContext('2d');
+	
+	_DrawingContext.font = "18px 'Source Code Pro'";
 
 	// Enable the added-in canvas text functions (see canvastext.js for provenance and details).
 	CanvasTextFunctions.enable(_DrawingContext);   // TODO: Text functionality is now built in to the HTML5 canvas. Consider using that instead.
@@ -34,7 +36,7 @@ function hostInit()
 	document.getElementById("taLog").value="";
 
 	// Set focus on the start button.
-   document.getElementById("btnStartOS").focus();
+    document.getElementById("btnStartOS").focus();
 
    // Check for our testing and enrichment core.
    if (typeof Glados === "function") {
@@ -79,6 +81,10 @@ function hostBtnStartOS_click(btn)
     document.getElementById("btnHaltOS").disabled = false;
     document.getElementById("btnReset").disabled = false;
     
+    _TaskBar = new TaskBar();
+    _TaskBar.init();
+    _TaskBar.setStatus("Starting...");
+    
     // .. set focus on the OS console display ... 
     document.getElementById("display").focus();
     
@@ -100,6 +106,8 @@ function hostBtnHaltOS_click(btn)
     krnShutdown();
     // Stop the JavaScript interval that's simulating our clock pulse.
     clearInterval(_hardwareClockID);
+    
+    if (!btn) { _TaskBar.setStatus("Halted");};
     // TODO: Is there anything else we need to do here?
 }
 

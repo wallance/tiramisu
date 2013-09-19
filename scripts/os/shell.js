@@ -12,11 +12,15 @@ function Shell() {
     this.commandList = [];
     this.curses      = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
     this.apologies   = "[sorry]";
+    this.commandHistory = [];
+    this.commandHistoryPosition = -1;
     // Methods
-    this.init        = shellInit;
-    this.putPrompt   = shellPutPrompt;
-    this.handleInput = shellHandleInput;
-    this.execute     = shellExecute;
+    this.init					  = shellInit;
+    this.putPrompt				  = shellPutPrompt;
+    this.handleInput			  = shellHandleInput;
+    this.execute				  = shellExecute;
+    this.getCommandHistoryAtIndex = commandHistoryAtIndex;    
+    this.displayCommandHistory	  = displayCommandHistory;
 }
 
 function shellInit() {
@@ -79,6 +83,48 @@ function shellInit() {
     sc.description = "<string> - Sets the prompt.";
     sc.function = shellPrompt;
     this.commandList[this.commandList.length] = sc;
+    
+    // status <string>
+    sc = new ShellCommand();
+    sc.command = "status";
+    sc.description = "<string> - Outputs user specified status to the task bar.";
+    sc.function = shellStatus;
+    this.commandList[this.commandList.length] = sc;
+    
+    // date
+    sc = new ShellCommand();
+    sc.command = "date";
+    sc.description = "- displays the current date and time.";
+    sc.function = shellDate;
+    this.commandList[this.commandList.length] = sc;
+    
+    // whereami
+    sc = new ShellCommand();
+    sc.command = "whereami";
+    sc.description = "- displays your current location.";
+    sc.function = shellWhereAmI;
+    this.commandList[this.commandList.length] = sc;
+    
+    // music
+    sc = new ShellCommand();
+    sc.command = "music";
+    sc.description = "<play | pause> - Plays or Stops \"Levels\" by Avicii.";
+    sc.function = shellMusic;
+    this.commandList[this.commandList.length] = sc;
+    
+    // bsod
+    sc = new ShellCommand();
+    sc.command = "bsod";
+    sc.description = "Intentionally displays the BSOD screen.";
+    sc.function = shellBsod;
+    this.commandList[this.commandList.length] = sc;
+    
+    // load
+    sc = new ShellCommand();
+    sc.command = "load";
+    sc.description = "Loads the user program from input.";
+    sc.function = shellLoadProgram;
+    this.commandList[this.commandList.length] = sc;
 
     // processes - list the running processes and their IDs
     // kill <id> - kills the specified process id.
@@ -95,6 +141,7 @@ function shellPutPrompt()
 
 function shellHandleInput(buffer)
 {
+	this.commandHistory[this.commandHistory.length] = buffer;
     krnTrace("Shell Command~" + buffer);
     // 
     // Parse the input...
@@ -179,6 +226,9 @@ function shellParseInput(buffer)
 
 function shellExecute(fn, args)
 {
+	// Reset the command history position counter
+	this.commandHistoryPosition = -1;
+	
     // We just got a command, so advance the line...
     _StdIn.advanceLine();
     // ... call the command function passing in the args...
@@ -360,4 +410,143 @@ function shellPrompt(args)
     {
         _StdIn.putText("Usage: prompt <string>  Please supply a string.");
     }
+}
+
+function shellStatus(args)
+{
+	if (args.length > 0)
+	{
+		_TaskBar.setStatus(args[0]);
+	}
+	else
+	{
+		_StdIn.putText("Usage: status <string>  Please supply a string.");
+	}
+}
+
+function shellDate(args)
+{    
+	var now = new Date();
+	var date = _TaskBar.getCurrentDate(now);
+	var time = _TaskBar.getCurrentTime(now);
+	_StdIn.putText("The current time is " + date + " " + time + ".");
+}
+
+function shellWhereAmI(args)
+{
+	_StdIn.putText("You're laying on a sunny beach in Hawai'i.");
+}
+
+function shellBsod()
+{
+	// Forces the display of the BSOD screen.
+	krnTrapError("Kernel error invoked intentionally.");
+	_TaskBar.setStatus("Unexpected Error");
+}
+
+function shellMusic(args)
+{
+	var player = document.getElementById("player");
+	player.volume = 0.5;
+	if (args[0] == "play")
+	{
+		// play() is a built-in method of the HTML5 audio player
+		player.play();
+		_StdIn.putText("Playing \"Levels\" by Avicii. Use \"pause\" to pause music.");
+	}
+	else if (args[0] == "pause")
+	{
+		// pause() is a built-in method of the HTML5 audio player
+		player.pause();
+		_StdIn.putText("Stopping music.");
+	}
+	else 
+	{
+		_StdIn.putText("Usage: <play | pause> - Plays or Stops \"Levels\" by Avicii.");
+	}
+}
+
+function shellLoadProgram(args)
+{
+	var userProgram = document.getElementById("taProgramInput").value;
+	
+	// No program entered into the input
+	if (userProgram.length == 0)
+	{
+		_StdIn.putText("Error: no program was entered.");
+		return;
+	};
+	
+	var matches = userProgram.match(/[^0-9A-F\s]+/i);
+	
+	// Check if there is at least one error
+	if (matches != null)
+	{
+		_StdIn.putText("There was an error in the program input.");
+	};
+	
+	//TODO: Actually load the program
+}
+
+function commandHistoryAtIndex(index)
+{
+	console.log(index);
+	return this.commandHistory[index];
+}
+
+function displayCommandHistory(keyCode)
+{
+	// No command history
+	if (this.commandHistory.length <= 0) { return; };
+	
+	// Check if position has been reset
+	if (this.commandHistoryPosition == -1) { this.commandHistoryPosition = this.commandHistory.length; };
+	
+	var shouldDisplay = false;
+	
+	// When the up arrow key is pressed
+	if (keyCode == 38)
+	{
+		if ((this.commandHistoryPosition > 0) && (this.commandHistoryPosition <= this.commandHistory.length))
+		{
+			this.commandHistoryPosition = this.commandHistoryPosition - 1;
+			shouldDisplay = true;
+		}
+		else if (this.commandHistoryPosition == 0)
+		{	
+			// Reached the first index (the oldest command), just display it
+			shouldDisplay = true;
+		}
+		
+	}
+	// When the down arrow key is pressed
+	else if (keyCode == 40)
+	{
+		var maxArrayIndex = this.commandHistory.length - 1;
+		if ( (this.commandHistoryPosition >= 0) && (this.commandHistoryPosition < maxArrayIndex) )
+		{
+			this.commandHistoryPosition = this.commandHistoryPosition + 1;
+			shouldDisplay = true;
+		}
+		else if ((this.commandHistoryPosition == maxArrayIndex) || (this.commandHistoryPosition >= this.commandHistory.length) )
+		{
+			// Reached the last index (the newest command), just display it
+			shouldDisplay = true;
+		}
+	}
+	
+	if (shouldDisplay)
+	{
+		// add the last entered command into the buffer and display it on screen
+		var lastCommand = _OsShell.getCommandHistoryAtIndex(this.commandHistoryPosition);
+		if (_Console.buffer != '') {
+			var length = _Console.buffer.length;
+			for (var i=0; i < length; i++) {
+				_Console.removeLastCharacter();
+			};
+			_Console.buffer = '';
+		};
+		_Console.buffer = lastCommand;
+		_Console.putText(lastCommand);
+	}
 }

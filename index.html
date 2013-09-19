@@ -2,10 +2,10 @@
 <html>
 <head>
    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-   <meta name="author"             content="Alan G. Labouseur" />
+   <meta name="author"             content="Alan G. Labouseur, Wallance Miranda" />
    <link rel="stylesheet" href="alanbbos.css" type="text/css" media="screen" />
    <title>
-      AlanBBOS - a Browser-based virtual Operating System
+      Tiramisu
    </title>
 
    <!-- Globals CONSTANTS and _Variables. Must included be first. -->
@@ -24,28 +24,35 @@
    <script type="text/javascript" src="scripts/os/deviceDriverKeyboard.js"></script>
    <script type="text/javascript" src="scripts/os/queue.js"></script>
    <script type="text/javascript" src="scripts/os/shell.js"></script>
+   <script type="text/javascript" src="scripts/os/taskBar.js"></script>
    <script type="text/javascript" src="scripts/os/kernel.js"></script>
 
    <!-- Other Routines -->
    <script type="text/javascript" src="scripts/utils.js"></script>
-   <script type="text/javascript" src="http://www.labouseur.com/courses/os/projects/glados.js"></script>
+   <!--<script type="text/javascript" src="http://www.labouseur.com/courses/os/projects/glados.js"></script>-->
+   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 </head>
 
 <body onload="hostInit();">
 
 <div id="divMain" style="width:100%;">
 
-   <div id="divButtonBar" style="margin:4px;">
-      <input type="button"
-             id = "btnStartOS"
+<header>
+	<img src="images/logo.png" id="logo" width="175px">
+	
+   <div id="taskBar"><div id="divButtonBar">
+      <input type="image"
+      		 src="images/bolt.png"
+             id="btnStartOS"
              name="brnStartOS"
              class="normal_button"
              value="Start"
              tabindex="0"
              onclick="hostBtnStartOS_click(this);">
 
-      <input type="button"
-             id = "btnHaltOS"
+      <input type="image"
+      		 src="images/x.png"
+             id="btnHaltOS"
              name="brnHaltOS"
              class="normal_button"
              disabled="disabled"
@@ -53,7 +60,8 @@
              tabindex="1"
              onclick="hostBtnHaltOS_click(this);">
 
-      <input type="button"
+      <input type="image"
+      		 src="images/reload.png"
              id = "btnReset"
              name="brnReset"
              class="normal_button"
@@ -62,6 +70,11 @@
              tabindex="2"
              onclick="hostBtnReset_click(this);">
    </div>
+		<div id="status">Off</div>
+		<div id="clock"></div>
+		<div id="date"></div>
+	</div>
+</header>
 
    <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
       <canvas id="display"
@@ -96,6 +109,14 @@
    </div>
 
 </div>
+
+<!--<iframe width="853" height="480" src="http://www.youtube.com/embed/XEhKSc52QqY?autoplay=1" frameborder="0" allowfullscreen></iframe>-->
+
+<audio id="player" controls loop preload="auto" hidden>
+  <source src="sounds/music.ogg" type="audio/ogg">
+  <source src="sounds/music.mp3" type="audio/mpeg">
+Your browser does not support the audio element.
+</audio>
 
 <p class="footerText" style="clear:both;">
    <br>
