@@ -17,26 +17,25 @@ UIUpdateManager.updateCPUMonitor = function () {
 };
 
 UIUpdateManager.initMemoryMonitor = function () {
-  this._generateRows();  
-};
-
-UIUpdateManager._generateRows = function() {
-    
+    // Holds all the row elements
     var tableBody = $('<tbody>');
     
-    //var tableRow = null;
-    
+    // Each row has eight "blocks"
     for (var i = 0; i < SYSTEM_MEMORY_SIZE; i = i + 8) {
+        
+        // 1 row of 8 blocks
         var tableRow = $('<tr>');
+        
+        // The starting address label
         $('<th>').html( '0x' + baseTenToEight(i)).appendTo(tableRow);
+        
+        // Create all 8 blocks
         for (var j = 0; j < 8; j++) {
             $('<td>').html('00').appendTo(tableRow);
         }
         $(tableRow).appendTo(tableBody);
     }
     $(tableBody).appendTo($('#memory-monitor table'));
-    //$().html(this._generateRows());
-    
 };
 
 function baseTenToEight(baseTen) {
