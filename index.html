@@ -1,128 +1,150 @@
 <!DOCTYPE HTML>
 <html>
-<head>
-   <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-   <meta name="author"             content="Alan G. Labouseur, Wallance Miranda" />
-   <link rel="stylesheet" href="main.css" type="text/css" media="screen" />
-   <title>Tiramisu - A Browser-Based OS</title>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+        <meta name="author"             content="Alan G. Labouseur, Wallance Miranda" />
+        <link rel="stylesheet" href="main.css" type="text/css" media="screen" />
+        <title>Tiramisu - A Browser-Based OS</title>
 
-   <!-- Globals CONSTANTS and _Variables. Must included be first. -->
-   <script type="text/javascript" src="globals.js"></script>	
+        <!-- Globals CONSTANTS and _Variables. Must included be first. -->
+        <script type="text/javascript" src="globals.js"></script>	
 
-   <!-- Host (Hardware Simulation) Routines -->
-   <script type="text/javascript" src="scripts/host/control.js"></script>
-   <script type="text/javascript" src="scripts/host/devices.js"></script>
-   <script type="text/javascript" src="scripts/host/cpu.js"></script>
+        <!-- Host (Hardware Simulation) Routines -->
+        <script type="text/javascript" src="scripts/host/control.js"></script>
+        <script type="text/javascript" src="scripts/host/devices.js"></script>
+        <script type="text/javascript" src="scripts/host/cpu.js"></script>
+        <script type="text/javascript" src="scripts/host/memory-hardware.js"></script>
+        <script type="text/javascript" src="scripts/host/UIUpdateManager.js"></script>
 
-   <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
-   <script type="text/javascript" src="scripts/os/interrupt.js"></script>
-   <script type="text/javascript" src="scripts/os/canvastext.js"></script>	
-   <script type="text/javascript" src="scripts/os/console.js"></script>	
-   <script type="text/javascript" src="scripts/os/deviceDriver.js"></script>
-   <script type="text/javascript" src="scripts/os/deviceDriverKeyboard.js"></script>
-   <script type="text/javascript" src="scripts/os/queue.js"></script>
-   <script type="text/javascript" src="scripts/os/shell.js"></script>
-   <script type="text/javascript" src="scripts/os/taskBar.js"></script>
-   <script type="text/javascript" src="scripts/os/kernel.js"></script>
+        <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
 
-   <!-- Other Routines -->
-   <script type="text/javascript" src="scripts/utils.js"></script>
-   <script type="text/javascript" src="http://www.labouseur.com/courses/os/projects/glados.js"></script>
-   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-</head>
+        <script type="text/javascript" src="scripts/os/interrupt.js"></script>
+        <script type="text/javascript" src="scripts/os/canvastext.js"></script>	
+        <script type="text/javascript" src="scripts/os/console.js"></script>	
+        <script type="text/javascript" src="scripts/os/deviceDriver.js"></script>
+        <script type="text/javascript" src="scripts/os/deviceDriverKeyboard.js"></script>
+        <script type="text/javascript" src="scripts/os/memory-manager.js"></script>
+        <script type="text/javascript" src="scripts/os/queue.js"></script>
+        <script type="text/javascript" src="scripts/os/shell.js"></script>
+        <script type="text/javascript" src="scripts/os/taskBar.js"></script>
+        <script type="text/javascript" src="scripts/os/kernel.js"></script>
 
-<body onload="hostInit();">
 
-<div id="divMain" style="width:100%;">
+        <!-- Other Routines -->
+        <script type="text/javascript" src="scripts/utils.js"></script>
+        <script type="text/javascript" src="http://www.labouseur.com/courses/os/projects/glados.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    </head>
 
-<header>
-	<img src="images/logo.png" id="logo" width="175">
-	
-	<div id="divButtonBar">
-      <input type="image"
-      		 src="images/bolt.png"
-             id="btnStartOS"
-             name="brnStartOS"
-             class="normal_button"
-             value="Start"
-             tabindex="0"
-             onclick="hostBtnStartOS_click(this);">
+    <body onload="hostInit();
+            UIUpdateManager.initMemoryMonitor();">
 
-      <input type="image"
-      		 src="images/x.png"
-             id="btnHaltOS"
-             name="brnHaltOS"
-             class="normal_button"
-             disabled="disabled"
-             value="Halt"
-             tabindex="1"
-             onclick="hostBtnHaltOS_click(this);">
+        <div id="divMain" style="width:100%;">
 
-      <input type="image"
-      		 src="images/reload.png"
-             id = "btnReset"
-             name="brnReset"
-             class="normal_button"
-             disabled="disabled"
-             value="Reset"
-             tabindex="2"
-             onclick="hostBtnReset_click(this);">
-   </div>
-	
-   <div id="taskBar">
-		<div id="status">Off</div>
-		<div id="clock"></div>
-		<div id="date"></div>
-	</div>
-</header>
+            <header>
+                <img src="images/logo.png" id="logo" width="175">
 
-   <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
-      <canvas id="display"
-              width="500"
-              height="500"
-              tabindex="3">
-      </canvas>
-   </div>
+                <div id="divButtonBar">
+                    <input type="image"
+                           src="images/bolt.png"
+                           id="btnStartOS"
+                           name="brnStartOS"
+                           class="normal_button"
+                           value="Start"
+                           tabindex="0"
+                           onclick="hostBtnStartOS_click(this);">
 
-   <div id="divLog" style="margin-left:520px;">
-      <label>
-         Log
-         <br>
-         <textarea name="taLog"
-                   id  ="taLog"
-                   rows="26"
-                   cols="48"
-         ></textarea>
-      </label>
-   </div>
+                    <input type="image"
+                           src="images/x.png"
+                           id="btnHaltOS"
+                           name="brnHaltOS"
+                           class="normal_button"
+                           disabled="disabled"
+                           value="Halt"
+                           tabindex="1"
+                           onclick="hostBtnHaltOS_click(this);">
 
-   <div id="divUserProgramInput" style="margin-left:520px;">
-      <label>
-         User Program Input
-         <br>
-         <textarea name="taProgramInput"
-                   id  ="taProgramInput"
-                   rows="8"
-                   cols="48"
-         ></textarea>
-      </label>
-   </div>
+                    <input type="image"
+                           src="images/reload.png"
+                           id = "btnReset"
+                           name="brnReset"
+                           class="normal_button"
+                           disabled="disabled"
+                           value="Reset"
+                           tabindex="2"
+                           onclick="hostBtnReset_click(this);">
+                </div>
 
-</div>
+                <div id="taskBar">
+                    <div id="status">Off</div>
+                    <div id="clock"></div>
+                    <div id="date"></div>
+                </div>
+            </header>
+            <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
+                <canvas id="display" width="500" height="550" tabindex="3"></canvas>
+            </div>
+            <div>
+                <div id="cpu-monitor" class="dashboard-item">
+                    <div>
+                        <img src="images/dashboard.png">
+                    </div>
+                    <div id="program-counter" class="figure">
+                        <span class="title">Program Counter</span>
+                        <span class="status">0x00</span>
+                    </div>
+                    <div id="accumulator" class="figure">
+                        <span class="title">Accumulator</span>
+                        <span class="status">0x00</span>
+                    </div>
+                    <div id="x-register" class="figure">
+                        <span class="title">X Register</span>
+                        <span class="status">0x00</span>
+                    </div>
+                    <div id="y-register" class="figure">
+                        <span class="title">Y Register</span>
+                        <span class="status">0x00</span>
+                    </div>
+                    <div id="z-flag" class="figure">
+                        <span class="title">Z Flag</span>
+                        <span class="status">0x00</span>
+                    </div>
+                </div>
+                <div id="memory-monitor" class="dashboard-item">
+                    <table>
+                    </table>
+                </div>
+                <div id="divLog">
+                    <label>
+                        Log
+                        <br>
+                        <textarea name="taLog" id  ="taLog" rows="24" cols="48"></textarea>
+                    </label>
+                </div>
+                <div class="">
+                <div id="divUserProgramInput">
+                    <label>
+                        User Program Input
+                        <br>
+                        <textarea name="taProgramInput" id  ="taProgramInput" rows="8" cols="48"></textarea>
+                    </label>
+                </div>
+            </div>
+            </div>
+            
+        </div>
 
-<audio id="player" controls loop preload="auto" hidden>
-  <source src="sounds/music.ogg" type="audio/ogg">
-  <source src="sounds/music.mp3" type="audio/mpeg">
-Your browser does not support the audio element.
-</audio>
+        <audio id="player" controls loop preload="auto" hidden>
+            <source src="sounds/music.ogg" type="audio/ogg">
+            <source src="sounds/music.mp3" type="audio/mpeg">
+        </audio>
 
-<p class="footerText" style="clear:both;">
-   <br>
-   Copyright &copy; 2008 - 2013 No Rights Reserved.
-   <br>
-   Reproduction is prohibited without the express written consent of
-   Ted Codd, Stevie Ray Vaughan, and Ian Fleming.
-</p>
-
-</body>
+        <footer>
+            <br>
+            Copyright &copy; 2008 - 2013 No Rights Reserved.
+            <br>
+            Reproduction is prohibited without the express written consent of
+            Ted Codd, Stevie Ray Vaughan, and Ian Fleming.
+        </footer>
+    </body>
 </html>
