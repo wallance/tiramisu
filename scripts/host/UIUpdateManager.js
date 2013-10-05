@@ -21,13 +21,13 @@ UIUpdateManager.initMemoryMonitor = function () {
     var tableBody = $('<tbody>');
     
     // Each row has eight "blocks"
-    for (var i = 0; i < SYSTEM_MEMORY_SIZE; i = i + 8) {
+    for (var address = 0; address < SYSTEM_MEMORY_SIZE; address = address + 8) {
         
         // 1 row of 8 blocks
         var tableRow = $('<tr>');
         
         // The starting address label
-        $('<th>').html( '0x' + baseTenToEight(i)).appendTo(tableRow);
+        $('<th>').html( '0x' + this.baseTenToEight(address)).appendTo(tableRow);
         
         // Create all 8 blocks
         for (var j = 0; j < 8; j++) {
@@ -38,6 +38,6 @@ UIUpdateManager.initMemoryMonitor = function () {
     $(tableBody).appendTo($('#memory-monitor table'));
 };
 
-function baseTenToEight(baseTen) {
+UIUpdateManager.baseTenToEight = function(baseTen) {
     return baseTen.toString(16).toUpperCase();
 };
