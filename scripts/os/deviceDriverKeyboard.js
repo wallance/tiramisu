@@ -23,7 +23,7 @@ function DeviceDriverKeyboard()                     // Add or override specific 
 function mapKeyCodeToCharacter(keyCode, wasShifted)
 {	
 	var nonshiftedCharacters = {
-		'48':'0',
+	'48':'0',
         '49':'1',
         '50':'2',
         '51':'3',
@@ -47,7 +47,7 @@ function mapKeyCodeToCharacter(keyCode, wasShifted)
         '222':'\''
 	};	
 	var shiftedCharacters = {
-		'48':')',
+	'48':')',
         '49':'!',
         '50':'@',
         '51':'#',
