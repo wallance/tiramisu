@@ -35,7 +35,11 @@ function krnBootstrap()      // Page 8.
    krnKeyboardDriver = new DeviceDriverKeyboard();     // Construct it.  TODO: Should that have a _global-style name?
    krnKeyboardDriver.driverEntry();                    // Call the driverEntry() initialization routine.
    krnTrace(krnKeyboardDriver.status);
-
+   
+   // Initalize memory and the PCB Factory
+   _MemoryManager = new MemoryManager();
+   _PCBFactory = new ProcessControlBlockFactory();
+   
    //
    // ... more?
    //
@@ -206,4 +210,31 @@ function krnTrapError(msg)
     //document.getElementById("player").pause();
     hostBtnHaltOS_click(false);
     
+}
+
+/*
+ * Loads source code into memory.
+ * 
+ * Note: Code must be validated before calling this method.
+ */
+function krnLoadProgram(sourceCode) {
+    
+    _StdIn.putText("Loading the program into memory...");
+    _StdIn.advanceLine();
+    
+    krnTrace("Loading user program into memory.");
+    
+    var pcb = _PCBFactory.createProcess();
+    
+    sourceCode = sourceCode.replace(/\s+/g, "");
+    
+    // Split the code into an array of opcodes, every two characters
+    // A great use of regex from: http://stackoverflow.com/questions/6259515/javascript-elegant-way-to-split-string-into-segments-n-characters-long
+    var splicedCode = sourceCode.match(/.{1,2}/g);
+    
+    for (var address=0; address < splicedCode.length; address++) {
+        _MemoryManager.writeDataAtLogicalAddress(address, splicedCode[address], pcb.getProcessID());
+    }
+    
+    return pcb.getProcessID();
 }
