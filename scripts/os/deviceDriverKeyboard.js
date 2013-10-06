@@ -119,10 +119,10 @@ function krnKbdDispatchKeyPress(params)
         // TODO: Check for caps-lock and handle as shifted if so.
         _KernelInputQueue.enqueue(chr);        
     }    
-    else if ( /*((keyCode >= 48) && (keyCode <= 57)) ||*/   // digits
-    		   (keyCode == 8)					   ||   // backspace
-               (keyCode == 32)                     ||   // space
-               (keyCode == 13) )                        // enter
+    else if (
+               (keyCode === 8)         ||   // backspace
+               (keyCode === 32)         ||   // space
+               (keyCode === 13) )            // enter
     {
     	console.log("Key code has been pressed: " + keyCode);
         chr = String.fromCharCode(keyCode);
@@ -137,7 +137,7 @@ function krnKbdDispatchKeyPress(params)
     	chr = mapKeyCodeToCharacter(keyCode, isShifted);
     	_KernelInputQueue.enqueue(chr); 
     }
-    else if ((keyCode == 38) || (keyCode == 40)) {
+    else if ((keyCode === 38) || (keyCode === 40)) {
     	// Further back in history (Up key)
     	_OsShell.displayCommandHistory(keyCode);
     }
