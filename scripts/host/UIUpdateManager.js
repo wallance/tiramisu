@@ -8,14 +8,39 @@ UIUpdateManager.update = function () {
     
 };
 
+/*
+ * Updates the CPU monitor's values.
+ */
 UIUpdateManager.updateCPUMonitor = function () {
-    $('#program-counter .status').html(_CPU.PC);
+    $('#program-counter .status').html(this.baseTenToBaseSixteen(_CPU.PC));
     $('#accumulator .status').html(_CPU.Acc);
     $('#x-register .status').html(_CPU.Xreg);
     $('#y-register .status').html(_CPU.Yreg);
     $('#z-flag .status').html(_CPU.Zflag);
 };
 
+/*
+ * Reads memory and updates the memory display at the specified base 10 address.
+ */
+UIUpdateManager.updateMemoryMonitorAtAddress = function(physicalAddress, data) {
+    
+    // This is how we identify the individual memory address in the memory monitor.
+    var addressCellId = 'mem-address-' + this.baseTenToBaseSixteen(physicalAddress);
+    
+    // Display the new data using the HTML ID.
+    $('#' + addressCellId).html(data);
+    
+};
+/*
+ * Reads memory and updates the entire memory display.  Useful for initial
+ */
+/*UIUpdateManager.updateMemoryMonitor = function() {
+    
+};*/
+
+/*
+ * Initalizes the memory display for the globally specified system memory size.
+ */
 UIUpdateManager.initMemoryMonitor = function () {
     // Holds all the row elements
     var tableBody = $('<tbody>');
@@ -27,17 +52,17 @@ UIUpdateManager.initMemoryMonitor = function () {
         var tableRow = $('<tr>');
         
         // The starting address label
-        $('<th>').html( '0x' + this.baseTenToEight(address)).appendTo(tableRow);
+        $('<th>').html( '0x' + this.baseTenToBaseSixteen(address)).appendTo(tableRow);
         
         // Create all 8 blocks
         for (var j = 0; j < 8; j++) {
-            $('<td>').html('00').appendTo(tableRow);
+            $('<td id="mem-address-' + this.baseTenToBaseSixteen(address + j ) + '">').html('00').appendTo(tableRow);
         }
         $(tableRow).appendTo(tableBody);
     }
     $(tableBody).appendTo($('#memory-monitor table'));
 };
 
-UIUpdateManager.baseTenToEight = function(baseTen) {
+UIUpdateManager.baseTenToBaseSixteen = function(baseTen) {
     return baseTen.toString(16).toUpperCase();
 };
