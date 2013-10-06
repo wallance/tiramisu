@@ -125,6 +125,13 @@ function shellInit() {
     sc.description = "Loads the user program from input.";
     sc.function = shellLoadProgram;
     this.commandList[this.commandList.length] = sc;
+    
+    // run
+    sc = new ShellCommand();
+    sc.command = "run";
+    sc.description = "<pid> runs a program in memory by the process ID.";
+    sc.function = shellRunProgram;
+    this.commandList[this.commandList.length] = sc;
 
     // processes - list the running processes and their IDs
     // kill <id> - kills the specified process id.
@@ -448,13 +455,13 @@ function shellMusic(args)
 {
 	var player = document.getElementById("player");
 	player.volume = 0.5;
-	if (args[0] == "play")
+	if (args[0] === "play")
 	{
 		// play() is a built-in method of the HTML5 audio player
 		player.play();
 		_StdIn.putText("Playing \"Levels\" by Avicii. Use \"pause\" to pause music.");
 	}
-	else if (args[0] == "pause")
+	else if (args[0] === "pause")
 	{
 		// pause() is a built-in method of the HTML5 audio player
 		player.pause();
@@ -471,7 +478,7 @@ function shellLoadProgram(args)
 	var userProgram = document.getElementById("taProgramInput").value;
 	
 	// No program entered into the input
-	if (userProgram.length == 0)
+	if (userProgram.length === 0)
 	{
 		_StdIn.putText("Error: no program was entered.");
 		return;
@@ -480,12 +487,24 @@ function shellLoadProgram(args)
 	var matches = userProgram.match(/[^0-9A-F\s]+/i);
 	
 	// Check if there is at least one error
-	if (matches != null)
+	if (matches !== null)
 	{
 		_StdIn.putText("There was an error in the program input.");
+                return;
 	};
-	
-	//TODO: Actually load the program
+        
+        var processId = krnLoadProgram(userProgram);
+        
+        _StdIn.putText('Loaded program and assigned a process ID of ' + processId + '.');
+}
+
+function shellRunProgram(args)
+{
+    if (args[0]) {
+        
+    } else {
+        _StdIn.putText("Usage: <pid> please specify processor ID.");
+    }
 }
 
 function commandHistoryAtIndex(index)
@@ -539,7 +558,7 @@ function displayCommandHistory(keyCode)
 	{
 		// add the last entered command into the buffer and display it on screen
 		var lastCommand = _OsShell.getCommandHistoryAtIndex(this.commandHistoryPosition);
-		if (_Console.buffer != '') {
+		if (_Console.buffer !== '') {
 			var length = _Console.buffer.length;
 			for (var i=0; i < length; i++) {
 				_Console.removeLastCharacter();
