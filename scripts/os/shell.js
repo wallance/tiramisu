@@ -501,6 +501,14 @@ function shellLoadProgram(args)
 function shellRunProgram(args)
 {
     if (args[0]) {
+        var pid = parseInt(args[0]);
+        
+        var pcb = _PCBFactory.getProcess(pid);
+        if (pcb != null) {
+            krnExecuteProcess(pid);
+        } else {
+            _StdIn.putText("An invalid PID was supplied.");
+        }
         
     } else {
         _StdIn.putText("Usage: <pid> please specify processor ID.");
