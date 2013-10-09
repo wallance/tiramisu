@@ -18,6 +18,10 @@ function ProcessControlBlock(pid, baseAddress, limitAddress, memoryBlock) {
     this.flagZ          = 0;
 }
 
+/**
+ * Getters
+ */
+
 ProcessControlBlock.prototype.getProcessID = function() {
     return this.pid;
 };
@@ -34,6 +38,10 @@ ProcessControlBlock.prototype.getAccumulator = function() {
     return this.accumulator;
 };
 
+ProcessControlBlock.prototype.getProgramCounter = function() {
+    return this.pc;
+};
+
 ProcessControlBlock.prototype.getRegisterX = function() {
     return this.registerX;
 };
@@ -45,6 +53,14 @@ ProcessControlBlock.prototype.getRegisterY = function() {
 ProcessControlBlock.prototype.getFlagZ = function() {
     return this.flagZ;
 };
+
+ProcessControlBlock.prototype.getState = function(state) {
+    return this.state;
+};
+
+/**
+ * Setters
+ */
 
 ProcessControlBlock.prototype.setAccumulator = function(acc) {
     this.accumulator = acc;
@@ -60,4 +76,20 @@ ProcessControlBlock.prototype.setRegisterY = function(y) {
 
 ProcessControlBlock.prototype.setFlagZ = function(z) {
     this.flagZ = z;
+};
+
+ProcessControlBlock.prototype.setBaseAddress = function(baseAddress) {
+    this.baseAddress = baseAddress;
+};
+
+ProcessControlBlock.prototype.setLimitAddress = function(limitAddress) {
+    this.limitAddress = limitAddress;
+};
+
+ProcessControlBlock.prototype.setProgramCounter = function(pc) {
+    this.pc = pc;
+};
+
+ProcessControlBlock.prototype.setState = function(state) {
+    this.state = state;
 };
