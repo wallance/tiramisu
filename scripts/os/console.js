@@ -39,7 +39,7 @@ function CLIconsole() {
            var chr = _KernelInputQueue.dequeue();
            
            // Check to see if it's "special" (enter or ctrl-c) or "normal" (anything else that the keyboard device driver gave us).
-           if (chr == String.fromCharCode(13))  //     Enter key
+           if (chr === String.fromCharCode(13))  //     Enter key
            {
                // The enter key marks the end of a console command, so ...
                // ... tell the shell ...
@@ -48,23 +48,11 @@ function CLIconsole() {
                this.buffer = "";
            }
            // Backspace buffer by one character, when text has been entered
-           else if ((chr == String.fromCharCode(8)) && (this.buffer.length > 0))
+           else if ((chr === String.fromCharCode(8)) && (this.buffer.length > 0))
            {
            		console.log("Remove from char has been executed"); 
            		
-           		this.removeLastCharacter();
-           		
-           		/*var positionOfCharToRemove = this.buffer.length - 1;
-           		console.log(positionOfCharToRemove);
-           		
-           		
-           		// From console
-           		this.removeChar(this.buffer.charAt(positionOfCharToRemove));   
-           		
-           		// From buffer
-           		this.buffer = this.buffer.slice(0, positionOfCharToRemove);
-           		console.log(this.buffer);*/
-           		       		
+           		this.removeLastCharacter();           		       		
            }
            // TODO: Write a case for Ctrl-C.
            else
@@ -86,13 +74,12 @@ function CLIconsole() {
        // decided to write one function and use the term "text" to connote string or char.
        if (text !== "")
        {
-           // Draw the text at the current X and Y coordinates.
-           _DrawingContext.drawText(this.CurrentFont, this.CurrentFontSize, this.CurrentXPosition, this.CurrentYPosition, text);
+            // Draw the text at the current X and Y coordinates.
+            _DrawingContext.drawText(this.CurrentFont, this.CurrentFontSize, this.CurrentXPosition, this.CurrentYPosition, text);
          	
-         	// Move the current X position.
-			var offset = _DrawingContext.measureText(this.CurrentFont, this.CurrentFontSize, text);
-			this.CurrentXPosition = this.CurrentXPosition + offset;
-           
+            // Move the current X position.
+            var offset = _DrawingContext.measureText(this.CurrentFont, this.CurrentFontSize, text);
+            this.CurrentXPosition = this.CurrentXPosition + offset;
        }
     };
 
@@ -161,47 +148,5 @@ function CLIconsole() {
 		// appropriate positions.  Make sure we don't forget about the OS Shell prompt!
 		var offset = _DrawingContext.measureText(this.CurrentFont, this.CurrentFontSize, newBuffer);
 		this.CurrentXPosition = beginXOffset + offset;
-    }
-    this.removeLastCharacter3 = function()
-    {
-    	var deletedChar = this.buffer.slice(-1);
-    	var startX = this.CurrentXPosition - _DrawingContext.measureText(this.CurrentFont, this.CurrentFontSize, deletedChar),
-            startY = this.CurrentYPosition - _DefaultFontSize - 2;
-        // Trim the buffer
-        this.buffer = this.buffer.substring(0, this.buffer.length - 1);
-        // Draw a rectangle over the letter that was deleted
-        _DrawingContext.clearRect(startX, startY, this.CurrentXPosition, this.CurrentYPosition + 2);
-        // Move the current X position since we've removed a character
-        this.CurrentXPosition -= _DrawingContext.measureText(this.CurrentFont, this.CurrentFontSize, deletedChar);
-    }
-    this.removeLastCharacter2 = function()
-    {	
-    	// Get the last character
-    	var lastCharacter = this.buffer.slice(-1);
-    	
-    	// Modify the buffer
-    	var slicedBuffer = this.buffer.substring(0, this.buffer.length - 1);
-		
-		// Calculate the coordinates of the character to be removed
-		var oldCharX = this.CurrentXPosition - _DrawingContext.measureText(this.CurrentFont, this.CurrentFontSize, lastCharacter);
-		var oldCharY = this.CurrentYPosition - _DefaultFontSize -2;
-    	
-    	var offset = this.CurrentFontSize + _FontHeightMargin;
-    	
-    	var startingXPosition = 12.48;
-    	
-		
-		// Remove the desired character
-		_DrawingContext.clearRect(oldCharX, oldCharY, this.CurrentXPosition, this.CurrentYPosition + 6);
-		
-		// Draw the modifiedBuffer at the starting X and Y coordinates.
-        //_DrawingContext.drawText(this.CurrentFont, this.CurrentFontSize, startingXPosition, this.CurrentYPosition, this.buffer);
-        
-		// Set the offset equal to the x and y coordinate where the previous character was
-		var offset = _DrawingContext.measureText(this.CurrentFont, this.CurrentFontSize, this.buffer);
-		
-        // Start new text input at the end of the "backspaced line" and add in the width of the shell prompt '>'
-		this.CurrentXPosition = oldCharX;
-		
-    }
-}
+    };
+};
