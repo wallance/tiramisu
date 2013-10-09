@@ -1,5 +1,5 @@
 /* 
- * Process Control Block Factory
+ * Process Control Block (PCB) Factory
  * 
  * Responsible for creating and maintaining user processes.
  */
@@ -11,6 +11,9 @@ function ProcessControlBlockFactory() {
     this.init();
 }
 
+/**
+ * Initalizes the factory prototype.
+ */
 ProcessControlBlockFactory.prototype.init = function() {
     if ((this.processes === null)) {
         this.processes = new Array();
@@ -19,6 +22,9 @@ ProcessControlBlockFactory.prototype.init = function() {
     }
 };
 
+/**
+ * Determines where the next base address should be and returns it.
+ */
 ProcessControlBlockFactory.prototype.getNextBaseAddress = function() {
      if(this.processes.length <= SYSTEM_MEMORY_BLOCK_SIZE) {
         return SYSTEM_MEMORY_BLOCK_SIZE * this.processes.length;
@@ -27,6 +33,9 @@ ProcessControlBlockFactory.prototype.getNextBaseAddress = function() {
     }
 };
 
+/**
+ * Determines where the next limit address should be and returns it.
+ */
 ProcessControlBlockFactory.prototype.getNextLimitAddress = function() {
     if(this.processes.length <= SYSTEM_MEMORY_BLOCK_SIZE) {
         // Subtract 1 because we started at 0.
@@ -63,14 +72,14 @@ ProcessControlBlockFactory.prototype.createProcess = function() {
     }
 };
 
-ProcessControlBlockFactory.prototype.removeProcess = function(block) {
-    
-};
-
 ProcessControlBlockFactory.prototype.getProcess = function(pid) {
-    if ( (typeof this.processes[pid] !== 'undefined') || (this.processes[pid] !== null) ) {
+    // Make sure the process exists.
+    if ( (typeof this.processes[pid] !== 'undefined') || (this.processes[pid] !== null) )
+    {
         return this.processes[pid];
-    } else {
+    }
+    else
+    {
         return null;
     }
 };
