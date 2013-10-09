@@ -95,12 +95,21 @@ function krnOnCPUClockPulse()
     }
     else if (_CPU.isExecuting) // If there are no interrupts then run one CPU cycle if there is anything being processed.
     {
+        // Execute a single cycle
         _CPU.cycle();
+        
+        // Refresh the CPU display and process monitor
+        UIUpdateManager.updateCPUMonitor();
+        UIUpdateManager.updateProcessMonitor(_CurrentExecutingProcess);
+        
+        // Only update memory when CPU is executing?
+        //UIUpdateManager.updateMemoryMonitorAtAddress();
     }    
     else                       // If there are no interrupts and there is nothing being executed then just be idle.
     {
        krnTrace("Idle");
     }
+    
 }
 
 
@@ -237,4 +246,29 @@ function krnLoadProgram(sourceCode) {
     }
     
     return pcb.getProcessID();
+}
+
+/*
+ * Executes the specified process ID.
+ */
+function krnExecuteProcess(pid) {
+    
+    // Obtain process info
+    var pcb = _PCBFactory.getProcess(pid);
+    
+    // PCB will be null if it does not exist
+    if (pcb !== null) {
+        
+        krnTrace("Executing process with a PID of " + pid + '.');        
+        
+        // Set the context of what process is executing.
+        _CurrentExecutingProcess = pcb.getProcessID();
+        
+        // Starts executing on the next clock pulse.
+        _CPU.isExecuting = true;
+        
+    } else {
+        _StdIn.putText('Process with an ID ' + pid + 'does not exist.');
+        return;
+    }
 }
