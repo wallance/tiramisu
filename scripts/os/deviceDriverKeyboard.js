@@ -124,7 +124,6 @@ function krnKbdDispatchKeyPress(params)
                (keyCode === 32)         ||   // space
                (keyCode === 13) )            // enter
     {
-    	console.log("Key code has been pressed: " + keyCode);
         chr = String.fromCharCode(keyCode);
         _KernelInputQueue.enqueue(chr); 
     }
@@ -133,7 +132,6 @@ function krnKbdDispatchKeyPress(params)
     		  ((keyCode >= 186) && (keyCode <= 192))	||
     		  ((keyCode >= 219) && (keyCode <= 222)) )
     {
-    	console.log("Key code has been pressed: " + keyCode);
     	chr = mapKeyCodeToCharacter(keyCode, isShifted);
     	_KernelInputQueue.enqueue(chr); 
     }
