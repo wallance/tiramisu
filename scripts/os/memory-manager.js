@@ -1,8 +1,8 @@
 /* 
  * Memory Manager
  * 
- * The manager is responsible for communicating between the system's memory
- * and the operating system.
+ * The manager is responsible for communicating between the system's physical
+ * memory and the operating system.
  */
 
 function MemoryManager() {
@@ -17,10 +17,7 @@ function MemoryManager() {
 MemoryManager.prototype.init = function() {
     if ( (this.systemMemory === null) && (this.memorySpecs === null) ) {
         
-        this.systemMemory = new MemoryHardware(SYSTEM_MEMORY_SIZE);
-        
-        //this.memorySpecs
-        
+        this.systemMemory = new MemoryHardware(SYSTEM_MEMORY_SIZE);        
     }
 };
 
@@ -43,12 +40,7 @@ MemoryManager.prototype.writeDataAtLogicalAddress = function(logicalAddress, dat
     if (typeof logicalAddress === 'string') {
         logicalAddress = parseInt(logicalAddress, 16);
     };
-    
-    //if (typeof data === 'string') {
         data = this.parseToHex(data);
-    //  };    
-    
-    //var pid = this.processesInBlocks
     
     var physicalAddress = this.translateAddress(logicalAddress, pid);
     
