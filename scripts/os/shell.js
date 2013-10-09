@@ -223,7 +223,7 @@ function shellParseInput(buffer)
     for (var i in tempList)
     {
         var arg = trim(tempList[i]);
-        if (arg != "")
+        if (arg !== "")
         {
             retVal.args[retVal.args.length] = tempList[i];
         }
@@ -504,9 +504,11 @@ function shellRunProgram(args)
         var pid = parseInt(args[0]);
         
         var pcb = _PCBFactory.getProcess(pid);
-        if (pcb != null) {
-            krnExecuteProcess(pid);
-        } else {
+        if (pcb !== null)
+        {
+            krnExecuteProcess(pid);            
+        }
+        else {
             _StdIn.putText("An invalid PID was supplied.");
         }
         
@@ -527,19 +529,19 @@ function displayCommandHistory(keyCode)
 	if (this.commandHistory.length <= 0) { return; };
 	
 	// Check if position has been reset
-	if (this.commandHistoryPosition == -1) { this.commandHistoryPosition = this.commandHistory.length; };
+	if (this.commandHistoryPosition === -1) { this.commandHistoryPosition = this.commandHistory.length; };
 	
 	var shouldDisplay = false;
 	
 	// When the up arrow key is pressed
-	if (keyCode == 38)
+	if (keyCode === 38)
 	{
 		if ((this.commandHistoryPosition > 0) && (this.commandHistoryPosition <= this.commandHistory.length))
 		{
 			this.commandHistoryPosition = this.commandHistoryPosition - 1;
 			shouldDisplay = true;
 		}
-		else if (this.commandHistoryPosition == 0)
+		else if (this.commandHistoryPosition === 0)
 		{	
 			// Reached the first index (the oldest command), just display it
 			shouldDisplay = true;
@@ -547,7 +549,7 @@ function displayCommandHistory(keyCode)
 		
 	}
 	// When the down arrow key is pressed
-	else if (keyCode == 40)
+	else if (keyCode === 40)
 	{
 		var maxArrayIndex = this.commandHistory.length - 1;
 		if ( (this.commandHistoryPosition >= 0) && (this.commandHistoryPosition < maxArrayIndex) )
@@ -555,7 +557,7 @@ function displayCommandHistory(keyCode)
 			this.commandHistoryPosition = this.commandHistoryPosition + 1;
 			shouldDisplay = true;
 		}
-		else if ((this.commandHistoryPosition == maxArrayIndex) || (this.commandHistoryPosition >= this.commandHistory.length) )
+		else if ((this.commandHistoryPosition === maxArrayIndex) || (this.commandHistoryPosition >= this.commandHistory.length) )
 		{
 			// Reached the last index (the newest command), just display it
 			shouldDisplay = true;
