@@ -18,7 +18,6 @@ ProcessControlBlockFactory.prototype.init = function() {
     if ((this.processes === null)) {
         this.processes = new Array();
         this.systemMemory = new MemoryHardware(SYSTEM_MEMORY_SIZE);
-        
     }
 };
 
@@ -29,7 +28,7 @@ ProcessControlBlockFactory.prototype.getNextBaseAddress = function() {
      if(this.processes.length <= SYSTEM_MEMORY_BLOCK_SIZE) {
         return SYSTEM_MEMORY_BLOCK_SIZE * this.processes.length;
     } else {
-        alert("ERROR base address!");
+        krnTrapError('The next base address exceeds the avaialble physical memory.');
     }
 };
 
@@ -41,7 +40,7 @@ ProcessControlBlockFactory.prototype.getNextLimitAddress = function() {
         // Subtract 1 because we started at 0.
         return this.getNextBaseAddress() + SYSTEM_MEMORY_BLOCK_SIZE - 1;
     } else {
-        alert("ERROR limit address!");
+        krnTrapError('The next limit address exceeds the available physical memory.');
     }
 };
 
@@ -57,18 +56,20 @@ ProcessControlBlockFactory.prototype.createProcess = function() {
     
     if (this.processes.length <= SYSTEM_MEMORY_BLOCK_COUNT) {
         
+        // First, determine what the properties for the new PCB should be.
         var baseAddress = this.getNextBaseAddress();
         var limitAddress = this.getNextLimitAddress();
         var memoryBlock = this.processes.length + 1;
         
         var pcb = new ProcessControlBlock(this.obtainNewProcessID(), baseAddress, limitAddress, memoryBlock);
         
+        // Add the new PCB to the list of processes.
         this.processes[pcb.getProcessID()] = pcb;
         
         return this.processes[pcb.getProcessID()];
     
     } else {
-        alert("too many processes");
+        krnTrapError('Could not create process. System only supports ' + SYSTEM_MEMORY_BLOCK_COUNT + '.');
     }
 };
 
