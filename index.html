@@ -38,7 +38,7 @@
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     </head>
 
-    <body onload="hostInit(); UIUpdateManager.initMemoryMonitor();">
+    <body onload="hostInit();">
 
         <div id="divMain" style="width:100%;">
 
@@ -121,12 +121,35 @@
                         <textarea name="taLog" id  ="taLog" rows="24" cols="48"></textarea>
                     </label>
                 </div>
+                <div id="process-monitor" class="dashboard-item">
+                    <table>
+                        <thead>
+                            <tr>
+                                <td colspan="9" class="title">Active User Processes</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <tr>
+                                <th class="pm-pid">ID</th>
+                                <th class="pm-state">State</th>
+                                <th class="pm-pc">PC</th>
+                                <th class="pm-acc">Acc</th>
+                                <th class="pm-x-reg">X</th>
+                                <th class="pm-y-reg">Y</th>
+                                <th class="pm-z-flag">Z</th>
+                                <th class="pm-base-address">Base Address</th>
+                                <th class="pm-limit-address">Limit Address</th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <div class="">
                 <div id="divUserProgramInput">
                     <label>
                         User Program Input
                         <br>
-                        <textarea name="taProgramInput" id  ="taProgramInput" rows="8" cols="48">A9 03 8D 41 00 A9 01 8D 40 00 AC 40 00 A2 01 FF EE 40 00 AE 40 00 EC 41 00 D0 EF A9 44 8D 42 00 A9 4F 8D 43 00 A9 4E 8D 44 00 A9 45 8D 45 00 A9 00 8D 46 00 A2 02 A0 42 FF 00</textarea>
+                        <textarea name="taProgramInput" id="taProgramInput" rows="3" cols="89">A9 00 8D 00 00 A9 00 8D 4B 00 A9 00 8D 4B 00 A2 03 EC 4B 00 D0 07 A2 01 EC 00 00 D0 05 A2 00 EC 00 00 D0 26 A0 4C A2 02 FF AC 4B 00 A2 01 FF A9 01 6D 4B 00 8D 4B 00 A2 02 EC 4B 00 D0 05 A0 55 A2 02 FF A2 01 EC 00 00 D0 C5 00 00 63 6F 75 6E 74 69 6E 67 00 68 65 6C 6C 6F 20 77 6F 72 6C 64 00</textarea>
                     </label>
                 </div>
             </div>
