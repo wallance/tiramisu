@@ -28,8 +28,6 @@ var SYSTEM_MEMORY_BLOCK_COUNT = 3;
 // Total size of the memory
 var SYSTEM_MEMORY_SIZE = SYSTEM_MEMORY_BLOCK_SIZE * SYSTEM_MEMORY_BLOCK_COUNT;
 
-
-
 //
 // Global Variables
 //
