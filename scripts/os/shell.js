@@ -132,6 +132,34 @@ function shellInit() {
     sc.description = "<pid> runs a program in memory by the process ID.";
     sc.function = shellRunProgram;
     this.commandList[this.commandList.length] = sc;
+    
+    // runall
+    sc = new ShellCommand();
+    sc.command = "runall";
+    sc.description = "Executes all loaded programs at once.";
+    sc.function = shellRunAll;
+    this.commandList[this.commandList.length] = sc;
+    
+    // quantum
+    sc = new ShellCommand();
+    sc.command = "quantum";
+    sc.description = "<int> sets the Round Robin quantum, in clock ticks.";
+    sc.function = shellQuantum;
+    this.commandList[this.commandList.length] = sc;
+    
+    // kill
+    sc = new ShellCommand();
+    sc.command = "run";
+    sc.description = "<pid> kills the program specified by the PID.";
+    sc.function = shellKill;
+    this.commandList[this.commandList.length] = sc;
+    
+    // top
+    sc = new ShellCommand();
+    sc.command = "run";
+    sc.description = "Shows currently running processes.";
+    sc.function = shellTop;
+    this.commandList[this.commandList.length] = sc;
 
     // processes - list the running processes and their IDs
     // kill <id> - kills the specified process id.
@@ -515,6 +543,44 @@ function shellRunProgram(args)
     } else {
         _StdIn.putText("Usage: <pid> please specify processor ID.");
     }
+}
+
+/**
+ * The shell method for executing all loaded programs.
+ * @returns {undefined}
+ */
+function shellRunAll()
+{
+    
+}
+
+/**
+ * The shell method that allows users to set the quantum for Round
+ * Robin scheduling.
+ * @returns {undefined}
+ */
+function shellQuantum()
+{
+    
+}
+
+/**
+ * The shell method that allows a user to kill the process with the specified
+ * PID.
+ * @returns {undefined}
+ */
+function shellKill()
+{
+    
+}
+
+/**
+ * The shell method that lists the active processes and their PIDs.
+ * @returns {undefined}
+ */
+function shellTop()
+{
+    
 }
 
 function commandHistoryAtIndex(index)
