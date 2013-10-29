@@ -17,7 +17,6 @@ ProcessControlBlockFactory.prototype.init = function()
 {
     if ((_ResidentProcesses === null)) {
         _ResidentProcesses = new Array();
-        this.systemMemory = new MemoryHardware(SYSTEM_MEMORY_SIZE);
     }
 };
 
