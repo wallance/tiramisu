@@ -8,8 +8,8 @@
 function MemoryManager() {
     this.systemMemory = null;
     this.memorySpecs = null;
-    this.processesInBlocks = [];
     this.relocationRegister = 0;
+    this.memoryBlocks = null;
     
     this.init();
 };
