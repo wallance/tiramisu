@@ -6,7 +6,7 @@
 function ProcessControlBlockFactory()
 {
     this.lastProcessID = 0; // Keeps track of the last PID used
-    
+    this.residentProcesses = null;
     this.init();
 }
 
@@ -15,8 +15,8 @@ function ProcessControlBlockFactory()
  */
 ProcessControlBlockFactory.prototype.init = function()
 {
-    if ((_ResidentProcesses === null)) {
-        _ResidentProcesses = new Array();
+    if ((this.residentProcesses === null)) {
+        this.residentProcesses = new Array();
     }
 };
 
@@ -25,8 +25,8 @@ ProcessControlBlockFactory.prototype.init = function()
  */
 ProcessControlBlockFactory.prototype.getNextBaseAddress = function()
 {
-     if(_ResidentProcesses.length <= SYSTEM_MEMORY_BLOCK_SIZE) {
-        return SYSTEM_MEMORY_BLOCK_SIZE * _ResidentProcesses.length;
+     if(this.residentProcesses.length <= SYSTEM_MEMORY_BLOCK_SIZE) {
+        return SYSTEM_MEMORY_BLOCK_SIZE * this.residentProcesses.length;
     } else {
         krnTrapError('The next base address exceeds the avaialble physical memory.');
     }
@@ -37,7 +37,7 @@ ProcessControlBlockFactory.prototype.getNextBaseAddress = function()
  */
 ProcessControlBlockFactory.prototype.getNextLimitAddress = function()
 {
-    if(_ResidentProcesses.length <= SYSTEM_MEMORY_BLOCK_SIZE) {
+    if(this.residentProcesses.length <= SYSTEM_MEMORY_BLOCK_SIZE) {
         // Subtract 1 because we started at 0.
         return this.getNextBaseAddress() + SYSTEM_MEMORY_BLOCK_SIZE - 1;
     } else {
@@ -57,21 +57,24 @@ ProcessControlBlockFactory.prototype.obtainNewProcessID = function()
 ProcessControlBlockFactory.prototype.createProcess = function()
 {
     
-    if (_ResidentProcesses.length <= SYSTEM_MEMORY_BLOCK_COUNT) {
-        
+    if (this.residentProcesses.length <= SYSTEM_MEMORY_BLOCK_COUNT)
+    {        
         // First, determine what the properties for the new PCB should be.
         var baseAddress = this.getNextBaseAddress();
         var limitAddress = this.getNextLimitAddress();
-        var memoryBlock = _ResidentProcesses.length + 1;
+        var memoryBlock = this.residentProcesses.length + 1;
         
         var pcb = new ProcessControlBlock(this.obtainNewProcessID(), baseAddress, limitAddress, memoryBlock);
         
         // Add the new PCB to the list of processes.
-        _ResidentProcesses[pcb.getProcessID()] = pcb;
+        this.residentProcesses[pcb.getProcessID()] = pcb;
         
-        return _ResidentProcesses[pcb.getProcessID()];
+        return this.residentProcesses[pcb.getProcessID()];
     
-    } else {
+    }
+    else
+    {
+        // TODO: In Project 4, this will be allowed because swapping will be implemented in the OS.
         krnTrapError('Could not create process. System only supports ' + SYSTEM_MEMORY_BLOCK_COUNT + '.');
     }
 };
@@ -79,9 +82,9 @@ ProcessControlBlockFactory.prototype.createProcess = function()
 ProcessControlBlockFactory.prototype.getProcess = function(pid)
 {
     // Make sure the process exists.
-    if ( (typeof _ResidentProcesses[pid] !== 'undefined') || (_ResidentProcesses[pid] !== null) )
+    if ( (typeof this.residentProcesses[pid] !== 'undefined') || (this.residentProcesses[pid] !== null) )
     {
-        return _ResidentProcesses[pid];
+        return this.residentProcesses[pid];
     }
     else
     {
@@ -91,5 +94,5 @@ ProcessControlBlockFactory.prototype.getProcess = function(pid)
 
 ProcessControlBlockFactory.prototype.getProcesses = function()
 {
-    return _ResidentProcesses;
+    return this.residentProcesses;
 };
