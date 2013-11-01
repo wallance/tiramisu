@@ -27,9 +27,15 @@ MemoryManager.prototype.init = function() {
     this.memoryBlocks = new Array(SYSTEM_MEMORY_BLOCK_COUNT);
     for (var i=0; i < this.memoryBlocks.length; i++)
     {
+        // Example for base addresses...
+        // 0 * 256 = 0
+        // 1 * 256 = 256
+        // 2 * 256 = 512
+        var nextBaseAddress = (i * SYSTEM_MEMORY_BLOCK_SIZE);
+        
         this.memoryBlocks[i] = { 
-                                    baseAddress  : 0,
-                                    limitAddress : 255,
+                                    baseAddress  : nextBaseAddress,
+                                    limitAddress : ( (nextBaseAddress * 2) - 1 ),
                                     available    : true
                                 };
     }
