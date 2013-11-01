@@ -580,7 +580,12 @@ function shellKill()
  */
 function shellTop()
 {
-    
+    var processes = _PCBFactory.getProcesses();
+    for (var i=0; i < processes.length; i++) {
+        _Console.advanceLine();
+        var processInfo = "Process #" + i + " with PID of: " + processes[i].getProcessID + ".";
+        _StdIn.putText(processInfo);
+    }
 }
 
 function commandHistoryAtIndex(index)
