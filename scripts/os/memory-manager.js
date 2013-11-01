@@ -7,18 +7,48 @@
 
 function MemoryManager() {
     this.systemMemory = null;
-    this.memorySpecs = null;
-    this.relocationRegister = 0;
+    
+    // Contains information about the blocks of memory
+    // This information should be contained within the MMU (Memory Management
+    // Unit), not the PCB.
     this.memoryBlocks = null;
     
     this.init();
 };
 
 MemoryManager.prototype.init = function() {
-    if ( (this.systemMemory === null) && (this.memorySpecs === null) ) {
-        
+    
+    if (this.systemMemory === null)
+    {
         this.systemMemory = new MemoryHardware(SYSTEM_MEMORY_SIZE);        
     }
+    
+    // Dynamically create the memory block array
+    this.memoryBlocks = new Array(SYSTEM_MEMORY_BLOCK_COUNT);
+    for (var i=0; i < this.memoryBlocks.length; i++)
+    {
+        this.memoryBlocks[i] = { 
+                                    baseAddress  : 0,
+                                    limitAddress : 255,
+                                    available    : true
+                                };
+    }
+    
+};
+
+MemoryManager.prototype.getNextAvailableBlock = function() {
+    
+    for (var i=0; i < this.memoryBlocks.length; i++)
+    {
+        if (this.memoryBlocks[i]['available'] === true)
+        {
+            return i;
+        }
+    }
+    // TODO: In project 4, swapping will need to be implemented, so this may
+    // need to be modified.
+    // No blocks are available, return the first block, which has an index of 0???
+    return 0;
 };
 
 MemoryManager.prototype.readDataAtPhysicalAddress = function(physicalAddress) {
