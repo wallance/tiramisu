@@ -12,7 +12,7 @@
 // Global CONSTANTS
 //
 var APP_NAME = "Tiramisu";  // 'cause I was at a loss for a better name.
-var APP_VERSION = "0.02";   // What did you expect?
+var APP_VERSION = "0.03";   // What did you expect?
 
 var CPU_CLOCK_INTERVAL = 100;   // This is in ms, or milliseconds, so 1000 = 1 second.
 
@@ -43,9 +43,11 @@ var _MemoryManager = null;
 var _PCBFactory = null;
 var _CurrentExecutingProcess = null;
 
+var _RoundRobinQuantum = 6;
+
 var _Canvas = null;               // Initialized in hostInit().
 var _DrawingContext = null;       // Initialized in hostInit().
-var _DefaultFontFamily = "Helvetica";  // Ignored, I think. The was just a place-holder in 2008, but the HTML canvas may have use for it.
+var _DefaultFontFamily = "Helvetica";  // Ignored, I think. This was just a place-holder in 2008, but the HTML canvas may have use for it.
 var _DefaultFontSize = 13;
 var _FontHeightMargin = 4;        // Additional space added to font size when advancing a line.
 
