@@ -6,7 +6,9 @@
 function ProcessControlBlockFactory()
 {
     this.lastProcessID = 0; // Keeps track of the last PID used
+    
     this.residentProcesses = null;
+    
     this.init();
 }
 
@@ -56,27 +58,31 @@ ProcessControlBlockFactory.prototype.obtainNewProcessID = function()
 
 ProcessControlBlockFactory.prototype.createProcess = function()
 {
-    
-    if (this.residentProcesses.length <= SYSTEM_MEMORY_BLOCK_COUNT)
-    {        
-        // First, determine what the properties for the new PCB should be.
-        var baseAddress = this.getNextBaseAddress();
-        var limitAddress = this.getNextLimitAddress();
-        var memoryBlock = this.residentProcesses.length + 1;
+        // Where should the new PCB be placed in memory.
+        var nextAvailableMemoryBlock = _MemoryManager.getNextAvailableBlock();
         
-        var pcb = new ProcessControlBlock(this.obtainNewProcessID(), baseAddress, limitAddress, memoryBlock);
+        if (nextAvailableMemoryBlock === null)
+        {
+            _StdIn.putText("Memory contains three processes. Kill at least one first.");
+            return null;
+        }
+        
+        _StdIn.putText("Loading the program into memory...");
+        _StdIn.advanceLine();
+        
+        // Determine details about the new PCB.
+        var baseAddress = nextAvailableMemoryBlock['baseAddress'];
+        var limitAddress = nextAvailableMemoryBlock['limitAddress'];
+        var memoryBlockId = nextAvailableMemoryBlock['blockId'];
+        
+        var pcb = new ProcessControlBlock(this.obtainNewProcessID(), baseAddress, limitAddress, memoryBlockId);
+        
+        _MemoryManager.setBlockAvailability(memoryBlockId, false);
         
         // Add the new PCB to the list of processes.
         this.residentProcesses[pcb.getProcessID()] = pcb;
         
         return this.residentProcesses[pcb.getProcessID()];
-    
-    }
-    else
-    {
-        // TODO: In Project 4, this will be allowed because swapping will be implemented in the OS.
-        krnTrapError('Could not create process. System only supports ' + SYSTEM_MEMORY_BLOCK_COUNT + '.');
-    }
 };
 
 ProcessControlBlockFactory.prototype.getProcess = function(pid)

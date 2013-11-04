@@ -523,7 +523,10 @@ function shellLoadProgram(args)
         
         var processId = krnLoadProgram(userProgram);
         
-        _StdIn.putText('Loaded program and assigned a process ID of ' + processId + '.');
+        if (processId !== null)
+        {
+            _StdIn.putText('Loaded program and assigned a process ID of ' + processId + '.');
+        }
 }
 
 function shellRunProgram(args)

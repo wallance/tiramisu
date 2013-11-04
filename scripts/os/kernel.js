@@ -226,14 +226,13 @@ function krnTrapError(msg)
  * 
  * Note: Code must be validated before calling this method.
  */
-function krnLoadProgram(sourceCode) {
+function krnLoadProgram(sourceCode) {    
     
-    _StdIn.putText("Loading the program into memory...");
-    _StdIn.advanceLine();
+    var pcb = _PCBFactory.createProcess();
     
     krnTrace("Loading user program into memory.");
     
-    var pcb = _PCBFactory.createProcess();
+    if (pcb === null) { return null; }
     
     sourceCode = sourceCode.replace(/\s+/g, "");
     
@@ -241,6 +240,7 @@ function krnLoadProgram(sourceCode) {
     // A great use of regex from: http://stackoverflow.com/questions/6259515/javascript-elegant-way-to-split-string-into-segments-n-characters-long
     var splicedCode = sourceCode.match(/.{1,2}/g);
     
+    // Loads code into memory
     for (var address=0; address < splicedCode.length; address++) {
         _MemoryManager.writeDataAtLogicalAddress(address, splicedCode[address], pcb.getProcessID());
     }

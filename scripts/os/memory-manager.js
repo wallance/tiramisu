@@ -6,6 +6,7 @@
  */
 
 function MemoryManager() {
+    
     this.systemMemory = null;
     
     // Contains information about the blocks of memory
@@ -16,6 +17,10 @@ function MemoryManager() {
     this.init();
 };
 
+/**
+ * Initalizes the Memory Manager's class members.
+ * @returns {undefined}
+ */
 MemoryManager.prototype.init = function() {
     
     if (this.systemMemory === null)
@@ -23,8 +28,11 @@ MemoryManager.prototype.init = function() {
         this.systemMemory = new MemoryHardware(SYSTEM_MEMORY_SIZE);        
     }
     
-    // Dynamically create the memory block array
     this.memoryBlocks = new Array(SYSTEM_MEMORY_BLOCK_COUNT);
+    
+    // Dynamically create the memory block array that holds basic 
+    // information about the blocks.  This is necessary to know
+    // when a block of memory is available for loading programs.
     for (var i=0; i < this.memoryBlocks.length; i++)
     {
         // Example for base addresses...
@@ -34,6 +42,7 @@ MemoryManager.prototype.init = function() {
         var nextBaseAddress = (i * SYSTEM_MEMORY_BLOCK_SIZE);
         
         this.memoryBlocks[i] = { 
+                                    blockId      : i,
                                     baseAddress  : nextBaseAddress,
                                     limitAddress : ( (nextBaseAddress * 2) - 1 ),
                                     available    : true
@@ -42,19 +51,29 @@ MemoryManager.prototype.init = function() {
     
 };
 
-MemoryManager.prototype.getNextAvailableBlock = function() {
-    
+/**
+ * Determines which memory block is available for use.
+ * 
+ * @returns {Array}  Information about the next available block.
+ */
+MemoryManager.prototype.getNextAvailableBlock = function()
+{    
     for (var i=0; i < this.memoryBlocks.length; i++)
     {
         if (this.memoryBlocks[i]['available'] === true)
         {
-            return i;
+            return this.memoryBlocks[i];
         }
     }
     // TODO: In project 4, swapping will need to be implemented, so this may
     // need to be modified.
-    // No blocks are available, return the first block, which has an index of 0???
-    return 0;
+    // No blocks are available, so don't return a block.
+    return null;
+};
+
+MemoryManager.prototype.setBlockAvailability = function(blockId, isAvailable)
+{
+    this.memoryBlocks[blockId]['available'] = isAvailable;
 };
 
 MemoryManager.prototype.readDataAtPhysicalAddress = function(physicalAddress) {
@@ -95,10 +114,6 @@ MemoryManager.prototype.translateAddress = function(logicalAddress, pid) {
     
     var translatedAddress = parseInt(pcb.getBaseAddress(), 10) + parseInt(logicalAddress, 10);
     return translatedAddress;
-};
-
-MemoryManager.prototype.getBlockInProcess = function(addressAsBaseEight) {
-    return;
 };
 
 MemoryManager.prototype.parseToHex = function(data) {
