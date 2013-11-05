@@ -234,6 +234,9 @@ function krnLoadProgram(sourceCode) {
     
     if (pcb === null) { return null; }
     
+    _MemoryManager.systemMemory.setBaseRegister(pcb.getBaseAddress());
+    _MemoryManager.systemMemory.setLimitRegister(pcb.getLimitAddress());
+    
     sourceCode = sourceCode.replace(/\s+/g, "");
     
     // Split the code into an array of opcodes, every two characters
