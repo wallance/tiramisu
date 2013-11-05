@@ -80,13 +80,10 @@ MemoryManager.prototype.validateAddress = function(address)
     
     var addressAsDecimal = parseInt(address, 10);
     
-    if ( (addressAsDecimal >= baseRegisterValue) && (addressAsDecimal <= limitRegisterValue) )
+    //if ( (addressAsDecimal >= baseRegisterValue) && (addressAsDecimal <= limitRegisterValue) )
+    if ( (addressAsDecimal >= 180) && (addressAsDecimal <= limitRegisterValue) )
     {
         isValid = true;
-    }
-    else
-    {
-        krnTrapError("Memory Access Out of bounds");
     }
     
     return isValid;
@@ -111,12 +108,10 @@ MemoryManager.prototype.clearMemoryBlock = function (blockId)
 };
 
 MemoryManager.prototype.readDataAtPhysicalAddress = function(physicalAddress) {
-    this.validateAddress(physicalAddress);
     return this.systemMemory.read(physicalAddress);
 };
 
 MemoryManager.prototype.writeDataAtPhysicalAddress = function(physicalAddress, data) {
-    this.validateAddress(physicalAddress);
     return this.systemMemory.write(physicalAddress, data);
 };
 
