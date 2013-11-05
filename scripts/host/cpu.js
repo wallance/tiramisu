@@ -176,6 +176,11 @@ Cpu.prototype.loadAccumulatorFromMemory = function () {
     // Format the bytes as a logical address
     var logicalAddress = (parseInt(secondAddressFragment, 16) + parseInt(firstAddressFragment, 16)); //.toString(16);
     
+    if (_MemoryManager.validateAddress(logicalAddress) === false)
+    {
+        this.memoryOutOfBoundsAccessHandler();
+    }
+    
     // Read the data at the determined logical address.
     this.Acc = _MemoryManager.readDataAtLogicalAddress(logicalAddress, _CurrentExecutingProcess);
     
@@ -195,6 +200,11 @@ Cpu.prototype.storeAccumulatorInMemory = function () {
     var secondAddressFragment = this.fetchNextByteFromMemory();
     
     var logicalAddress = (parseInt(secondAddressFragment, 16) + parseInt(firstAddressFragment, 16));
+    
+    if (_MemoryManager.validateAddress(logicalAddress) === false)
+    {
+        this.memoryOutOfBoundsAccessHandler();
+    }
     
     _MemoryManager.writeDataAtLogicalAddress(logicalAddress, this.Acc, _CurrentExecutingProcess);
     
@@ -216,6 +226,11 @@ Cpu.prototype.addWithCarry = function () {
     
     // Format the bytes as a logical address
     var logicalAddress = (parseInt(secondAddressFragment, 16) + parseInt(firstAddressFragment, 16));
+    
+    if (_MemoryManager.validateAddress(logicalAddress) === false)
+    {
+        this.memoryOutOfBoundsAccessHandler();
+    }
     
     // Read the data at the determined logical address.
     var additive = _MemoryManager.readDataAtLogicalAddress(logicalAddress, _CurrentExecutingProcess);
@@ -256,6 +271,11 @@ Cpu.prototype.loadRegisterXFromMemory = function () {
     // Format the bytes as a logical address
     var logicalAddress = (parseInt(secondAddressFragment, 16) + parseInt(firstAddressFragment, 16));
     
+    if (_MemoryManager.validateAddress(logicalAddress) === false)
+    {
+        this.memoryOutOfBoundsAccessHandler();
+    }
+    
     // Read the data at the determined logical address.
     this.Xreg = _MemoryManager.readDataAtLogicalAddress(logicalAddress, _CurrentExecutingProcess);
     
@@ -293,6 +313,11 @@ Cpu.prototype.loadRegisterYFromMemory = function () {
     
     // Format the bytes as a logical address
     var logicalAddress = (parseInt(secondAddressFragment, 16) + parseInt(firstAddressFragment, 16));
+    
+    if (_MemoryManager.validateAddress(logicalAddress) === false)
+    {
+        this.memoryOutOfBoundsAccessHandler();
+    }
     
     // Read the data at the determined logical address.
     this.Yreg = _MemoryManager.readDataAtLogicalAddress(logicalAddress, _CurrentExecutingProcess);
@@ -357,6 +382,11 @@ Cpu.prototype.compareByteInMemoryWithRegisterX = function () {
     // Format the bytes as a logical address
     var logicalAddress = (parseInt(secondAddressFragment, 16) + parseInt(firstAddressFragment, 16));
     
+    if (_MemoryManager.validateAddress(logicalAddress) === false)
+    {
+        this.memoryOutOfBoundsAccessHandler();
+    }
+    
     // Read the data at the determined logical address.
     var memoryContents = _MemoryManager.readDataAtLogicalAddress(logicalAddress, _CurrentExecutingProcess);
     
@@ -420,6 +450,11 @@ Cpu.prototype.incrementValueOfAByte = function () {
     // Format the bytes as a logical address
     var logicalAddress = (parseInt(secondAddressFragment, 16) + parseInt(firstAddressFragment, 16));
     
+    if (_MemoryManager.validateAddress(logicalAddress) === false)
+    {
+        this.memoryOutOfBoundsAccessHandler();
+    }
+    
     // Convert to decimal
     var memoryContentsAsBaseTen = parseInt(_MemoryManager.readDataAtLogicalAddress(logicalAddress, _CurrentExecutingProcess), 16);
     
@@ -473,15 +508,30 @@ Cpu.prototype.systemCall = function () {
         }
         // Output the entire string
         _StdIn.putText(textOutput);
-    }
-    
-   
-    
+    }    
     // We are done executing this op code
     this.incrementProgramCounter();
 };
 
-Cpu.prototype.setCPUProperties = function(programCounter, accumulator, xReg, yReg, zFlag) {
+Cpu.prototype.memoryOutOfBoundsAccessHandler = function()
+{
+    if (typeof _CurrentExecutingProcess === 'number')
+    {
+        var args = new Array();
+        args[0] = _CurrentExecutingProcess;
+        // Kill the current executing process
+        shellKill( args );
+        throw new Error("MEMORY OUT OF BOUNDS.");
+    } else
+    {
+        // This should never happen, as long as the _CurrentExecutingProcess is
+        // set properly.
+        krnTrapError("Failed to kill the current executing process after a memory out of bounds error occured.");
+    }
+}
+
+Cpu.prototype.setCPUProperties = function(programCounter, accumulator, xReg, yReg, zFlag)
+{
         this.PC     = programCounter;
         this.Acc    = accumulator;
         this.Xreg   = xReg;
@@ -490,8 +540,11 @@ Cpu.prototype.setCPUProperties = function(programCounter, accumulator, xReg, yRe
 };
     
 // Called when isExecuting is true
-Cpu.prototype.cycle = function() {
+Cpu.prototype.cycle = function()
+{
     krnTrace("CPU cycle");
+    
+    _CPUScheduler.schedule();
     
     // Begin the execution
     this.executeNextInstruction();
