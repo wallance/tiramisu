@@ -6,7 +6,7 @@
 function ProcessControlBlock(pid, baseAddress, limitAddress, memoryBlock) {
     
     this.pid            = pid;
-    this.state          = "NEW";
+    this.state          = "New";
     this.pc             = 0;
     this.baseAddress    = baseAddress;
     this.limitAddress   = limitAddress;
