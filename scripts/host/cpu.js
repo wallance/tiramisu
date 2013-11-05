@@ -114,7 +114,7 @@ Cpu.prototype.fetchNextByteFromMemory = function() {
     var nextByte = _MemoryManager.readDataAtLogicalAddress(nextLogicalAddress, _CurrentExecutingProcess);
     
     return nextByte;
-}
+};
 
 Cpu.prototype.fetchNextInstructionFromMemory = function() {
     // The program counter (PC) contains the next logical address
@@ -513,22 +513,28 @@ Cpu.prototype.systemCall = function () {
     this.incrementProgramCounter();
 };
 
-Cpu.prototype.memoryOutOfBoundsAccessHandler = function()
+Cpu.prototype.killCurrentExecutingProcess = function(errorType, message)
 {
     if (typeof _CurrentExecutingProcess === 'number')
     {
         var args = new Array();
         args[0] = _CurrentExecutingProcess;
+        
         // Kill the current executing process
         shellKill( args );
-        throw new Error("MEMORY OUT OF BOUNDS.");
+        throw new Error(message);
     } else
     {
         // This should never happen, as long as the _CurrentExecutingProcess is
         // set properly.
-        krnTrapError("Failed to kill the current executing process after a memory out of bounds error occured.");
+        krnTrapError("Failed to kill the current executing process after an error occured: " + errorType + ".");
     }
-}
+};
+
+Cpu.prototype.memoryOutOfBoundsAccessHandler = function()
+{
+    this.killCurrentExecutingProcess("Memory Out of Bounds", "Process attempted to access memory outside its base and limit addresses.");
+};
 
 Cpu.prototype.setCPUProperties = function(programCounter, accumulator, xReg, yReg, zFlag)
 {
