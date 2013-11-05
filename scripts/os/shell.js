@@ -149,8 +149,8 @@ function shellInit() {
     
     // kill
     sc = new ShellCommand();
-    sc.command = "run";
-    sc.description = "<pid> kills the program specified by the PID.";
+    sc.command = "kill";
+    sc.description = "<pid> terminates the specified process.";
     sc.function = shellKill;
     this.commandList[this.commandList.length] = sc;
     
@@ -160,10 +160,6 @@ function shellInit() {
     sc.description = "Shows currently running processes.";
     sc.function = shellTop;
     this.commandList[this.commandList.length] = sc;
-
-    // processes - list the running processes and their IDs
-    // kill <id> - kills the specified process id.
-
     //
     // Display the initial prompt.
     this.putPrompt();
@@ -570,11 +566,31 @@ function shellQuantum()
 /**
  * The shell method that allows a user to kill the process with the specified
  * PID.
+ * @param {type} args Command line arguments
  * @returns {undefined}
  */
-function shellKill()
+function shellKill(args)
 {
-    
+    if (args.length > 0)
+    {
+        // Get the process ID.
+        var pid = parseInt(args[0], 10);
+        
+        var pcb = _PCBFactory.getProcess(pid);
+        pcb.setState("Terminated");
+        
+        // Where is this memory block located?
+        var memoryBlock = pcb.getMemoryBlock();
+        
+        // Makes the block available for use.
+        _MemoryManager.clearMemoryBlock(memoryBlock);
+        
+        _StdIn.putText("Terminated process " + pid + ".");
+    }
+    else
+    {
+        _StdIn.putText("Usage: <pid> please specify processor ID.");
+    }
 }
 
 /**
