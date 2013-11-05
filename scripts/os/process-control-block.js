@@ -54,8 +54,12 @@ ProcessControlBlock.prototype.getFlagZ = function() {
     return this.flagZ;
 };
 
-ProcessControlBlock.prototype.getState = function(state) {
+ProcessControlBlock.prototype.getState = function() {
     return this.state;
+};
+
+ProcessControlBlock.prototype.getMemoryBlock = function() {
+    return this.memoryBlock;
 };
 
 /**
