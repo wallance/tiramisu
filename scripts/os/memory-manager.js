@@ -44,7 +44,7 @@ MemoryManager.prototype.init = function() {
         this.memoryBlocks[i] = { 
                                     blockId      : i,
                                     baseAddress  : nextBaseAddress,
-                                    limitAddress : ( (nextBaseAddress * 2) - 1 ),
+                                    limitAddress : ( (nextBaseAddress + SYSTEM_MEMORY_BLOCK_SIZE) - 1 ),
                                     available    : true
                                 };
     }
@@ -71,19 +71,59 @@ MemoryManager.prototype.getNextAvailableBlock = function()
     return null;
 };
 
+MemoryManager.prototype.validateAddress = function(address)
+{
+    var isValid = false;
+    
+    var baseRegisterValue = this.systemMemory.getBaseRegister();
+    var limitRegisterValue = this.systemMemory.getLimitRegister();
+    
+    var addressAsDecimal = parseInt(address, 10);
+    
+    if ( (addressAsDecimal >= baseRegisterValue) && (addressAsDecimal <= limitRegisterValue) )
+    {
+        isValid = true;
+    }
+    else
+    {
+        krnTrapError("Memory Access Out of bounds");
+    }
+    
+    return isValid;
+}
+
 MemoryManager.prototype.setBlockAvailability = function(blockId, isAvailable)
 {
     this.memoryBlocks[blockId]['available'] = isAvailable;
 };
 
+MemoryManager.prototype.clearMemoryBlock = function (blockId)
+{
+    if (this.memoryBlocks[blockId]['available'] === false)
+    {        
+        // Mark block as available
+        this.memoryBlocks[blockId]['available'] = true;
+    }
+    else {
+        // TODO: Don't do this here
+        krnTrace('Failed to clear memory block!');
+    }
+};
+
 MemoryManager.prototype.readDataAtPhysicalAddress = function(physicalAddress) {
+    this.validateAddress(physicalAddress);
     return this.systemMemory.read(physicalAddress);
+};
+
+MemoryManager.prototype.writeDataAtPhysicalAddress = function(physicalAddress, data) {
+    this.validateAddress(physicalAddress);
+    return this.systemMemory.write(physicalAddress, data);
 };
 
 MemoryManager.prototype.readDataAtLogicalAddress = function(logicalAddress, pid) {
     var physicalAddress = this.translateAddress(logicalAddress, pid);
-    
-    return this.systemMemory.read(physicalAddress);
+    //this.validateAddress(physicalAddress);
+    return this.readDataAtPhysicalAddress(physicalAddress);
 };
 
 MemoryManager.prototype.readDataAtNextLogicalAddress = function(logicalAddress, pid) {
@@ -100,7 +140,8 @@ MemoryManager.prototype.writeDataAtLogicalAddress = function(logicalAddress, dat
     var physicalAddress = this.translateAddress(logicalAddress, pid);
     
     // Save it to the hardware memory
-    this.systemMemory.write(physicalAddress, data);
+    
+    this.writeDataAtPhysicalAddress(physicalAddress, data);
     
     UIUpdateManager.updateMemoryMonitorAtAddress(physicalAddress, _MemoryManager.readDataAtPhysicalAddress(physicalAddress));
 };
