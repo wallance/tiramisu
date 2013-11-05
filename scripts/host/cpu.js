@@ -97,7 +97,8 @@ Cpu.prototype.executeNextInstruction = function () {
         // See: http://stackoverflow.com/questions/7652672/call-function-from-string-inside-object
         this[instructionMethod]();
     } else {
-        krnTrapError("Failed to execute an invalid operaton code: " + nextInstruction + ".");
+        // Terminate the current process.
+        this.killCurrentExecutingProcess("Unsupported Instruction", "An invalid opcode was encountered.");
     }
 };
 
