@@ -35,7 +35,7 @@ var _CPU = null;
 
 var _OSclock = 0;       // Page 23.
 
-var _Mode = 0;   // 0 = Kernel Mode, 1 = User Mode.  See page 21.
+var _Mode = 1;   // 0 = Kernel Mode, 1 = User Mode.  See page 21.
 
 var _MemoryManager = null;
 
@@ -43,6 +43,9 @@ var _MemoryManager = null;
 var _PCBFactory = null;
 var _CurrentExecutingProcess = null;
 
+// CPU Scheduler
+var _CPUScheduler = null;
+var _RoundRobinCycleCount = null;
 var _RoundRobinQuantum = 6;
 
 var _Canvas = null;               // Initialized in hostInit().
@@ -58,6 +61,7 @@ var _Trace = true;
 var _KernelInterruptQueue = null;
 var _KernelBuffers = null;
 var _KernelInputQueue = null;
+var _ReadyQueue = null;
 
 // Standard input and output
 var _StdIn  = null;
