@@ -527,19 +527,30 @@ function shellLoadProgram(args)
 
 function shellRunProgram(args)
 {
-    if (args[0]) {
+    if (args[0])
+    {
         var pid = parseInt(args[0]);
         
         var pcb = _PCBFactory.getProcess(pid);
+        
         if (pcb !== null)
         {
+            // Add process PCB to ready queue.
+            _ReadyQueue.enqueue(pcb);
+            pcb.setStatus("Ready");
+            
+            // Be usre to remove the PCB from the resident process list
+            _PCBFactory.residentProcesses[pcb.getProcessId()] = null;
+            
             krnExecuteProcess(pid);            
         }
-        else {
+        else
+        {
             _StdIn.putText("An invalid PID was supplied.");
         }
-        
-    } else {
+    }
+    else
+    {
         _StdIn.putText("Usage: <pid> please specify processor ID.");
     }
 }
@@ -550,7 +561,23 @@ function shellRunProgram(args)
  */
 function shellRunAll()
 {
-    
+    var processes = _PCBFactory.getProcesses();
+    for (var i=0; i < processes.length; i++)
+    {
+        //if (pid >= 0)
+        //{
+            var pid = processes[i].getProcessID();
+
+            krnTrace("Executing processes: " + pid + ".");
+
+            _ReadyQueue.enqueue(pid);
+            processes[i].setState("Ready");
+            //processes[i] = null;
+            
+            // Update the ready queue display.
+            UIUpdateManager.updateProcessMonitor(pid);
+        //}
+    }
 }
 
 /**
@@ -558,9 +585,16 @@ function shellRunAll()
  * Robin scheduling.
  * @returns {undefined}
  */
-function shellQuantum()
+function shellQuantum(args)
 {
-    
+    if (typeof args[0] === 'number')
+    {
+        _RoundRobinQuantum = args[0];
+    }
+    else
+    {
+        StdIn.putText("Usage: <int> please specify the quantum as an integer.");
+    }
 }
 
 /**
