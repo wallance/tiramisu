@@ -40,9 +40,7 @@ function krnBootstrap()      // Page 8.
    _MemoryManager = new MemoryManager();
    _PCBFactory = new ProcessControlBlockFactory();
    
-   //
-   // ... more?
-   //
+   _ReadyQueue = new Queue();
 
    // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
    krnTrace("Enabling the interrupts.");
@@ -229,6 +227,8 @@ function krnTrapError(msg)
 function krnLoadProgram(sourceCode) {    
     
     var pcb = _PCBFactory.createProcess();
+    
+    UIUpdateManager.updateProcessMonitor(pcb.getProcessID());
     
     krnTrace("Loading user program into memory.");
     
