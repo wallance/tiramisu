@@ -91,7 +91,9 @@ function krnOnCPUClockPulse()
         var interrupt = _KernelInterruptQueue.dequeue();
         krnInterruptHandler(interrupt.irq, interrupt.params);
     }
-    else if (_CPU.isExecuting) // If there are no interrupts then run one CPU cycle if there is anything being processed.
+    // If there are no interrupts then run one CPU cycle if the CPU is in execution mode
+    // or if there is a process on the ready queue.
+    else if (_CPU.isExecuting || _ReadyQueue.getSize() > 0)
     {
         // Execute a single cycle
         _CPU.cycle();
@@ -185,7 +187,7 @@ function krnTrace(msg)
       if (msg === "Idle")
       {
          // We can't log every idle clock pulse because it would lag the browser very quickly.
-         if (_OSclock % 10 == 0)  // Check the CPU_CLOCK_INTERVAL in globals.js for an 
+         if (_OSclock % 10 === 0)  // Check the CPU_CLOCK_INTERVAL in globals.js for an 
          {                        // idea of the tick rate and adjust this line accordingly.
             hostLog(msg, "OS");
          }         
