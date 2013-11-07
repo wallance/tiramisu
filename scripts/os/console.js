@@ -49,10 +49,8 @@ function CLIconsole() {
            }
            // Backspace buffer by one character, when text has been entered
            else if ((chr === String.fromCharCode(8)) && (this.buffer.length > 0))
-           {
-           		console.log("Remove from char has been executed"); 
-           		
-           		this.removeLastCharacter();           		       		
+           {           		
+                this.removeLastCharacter();           		       		
            }
            // TODO: Write a case for Ctrl-C.
            else
