@@ -18,7 +18,7 @@ function Queue()
     };
 
     this.isEmpty = function(){
-        return (this.q.length == 0);    
+        return (this.q.length === 0);    
     };
 
     this.enqueue = function(element) {
@@ -42,5 +42,17 @@ function Queue()
             retVal += "[" + this.q[i] + "] ";
         }
         return retVal;
+    };
+    
+    this.getNext = function() {
+        if (this.getSize() > 0)
+        {
+            // We don't want to remove it, only return the item
+            return this.q[0];
+        }
+        else
+        {
+            return null;
+        }
     };
 }
