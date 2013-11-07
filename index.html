@@ -29,6 +29,7 @@
         <script type="text/javascript" src="scripts/os/queue.js"></script>
         <script type="text/javascript" src="scripts/os/shell.js"></script>
         <script type="text/javascript" src="scripts/os/taskBar.js"></script>
+        <script type="text/javascript" src="scripts/os/scheduler.js"></script>
         <script type="text/javascript" src="scripts/os/kernel.js"></script>
 
 
@@ -126,6 +127,29 @@
                         <thead>
                             <tr>
                                 <td colspan="9" class="title">Active User Processes</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <tr>
+                                <th class="pm-pid">ID</th>
+                                <th class="pm-state">State</th>
+                                <th class="pm-pc">PC</th>
+                                <th class="pm-acc">Acc</th>
+                                <th class="pm-x-reg">X</th>
+                                <th class="pm-y-reg">Y</th>
+                                <th class="pm-z-flag">Z</th>
+                                <th class="pm-base-address">Base Address</th>
+                                <th class="pm-limit-address">Limit Address</th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="ready-queue-monitor" class="dashboard-item">
+                    <table>
+                        <thead>
+                            <tr>
+                                <td colspan="9" class="title">Ready Queue</td>
                             </tr>
                         </thead>
                         <tbody>
