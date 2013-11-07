@@ -84,6 +84,8 @@ Cpu.prototype.executeNextInstruction = function () {
     // Determine next instruction
     var nextInstruction = this.fetchNextInstructionFromMemory();
     
+    console.log("Process ID: " + _CurrentExecutingProcess + " is executing instruction: " + nextInstruction);
+    
     // Determine corresponding method
     var instructionMethod = this.OPERATION_CODES[nextInstruction];
     
@@ -177,7 +179,7 @@ Cpu.prototype.loadAccumulatorFromMemory = function () {
     // Format the bytes as a logical address
     var logicalAddress = (parseInt(secondAddressFragment, 16) + parseInt(firstAddressFragment, 16)); //.toString(16);
     
-    if (_MemoryManager.validateAddress(logicalAddress) === false)
+    if (_MemoryManager.validateAddress(logicalAddress, true) === false)
     {
         this.memoryOutOfBoundsAccessHandler();
     }
@@ -202,7 +204,7 @@ Cpu.prototype.storeAccumulatorInMemory = function () {
     
     var logicalAddress = (parseInt(secondAddressFragment, 16) + parseInt(firstAddressFragment, 16));
     
-    if (_MemoryManager.validateAddress(logicalAddress) === false)
+    if (_MemoryManager.validateAddress(logicalAddress, true) === false)
     {
         this.memoryOutOfBoundsAccessHandler();
     }
@@ -228,7 +230,7 @@ Cpu.prototype.addWithCarry = function () {
     // Format the bytes as a logical address
     var logicalAddress = (parseInt(secondAddressFragment, 16) + parseInt(firstAddressFragment, 16));
     
-    if (_MemoryManager.validateAddress(logicalAddress) === false)
+    if (_MemoryManager.validateAddress(logicalAddress, true) === false)
     {
         this.memoryOutOfBoundsAccessHandler();
     }
@@ -272,7 +274,7 @@ Cpu.prototype.loadRegisterXFromMemory = function () {
     // Format the bytes as a logical address
     var logicalAddress = (parseInt(secondAddressFragment, 16) + parseInt(firstAddressFragment, 16));
     
-    if (_MemoryManager.validateAddress(logicalAddress) === false)
+    if (_MemoryManager.validateAddress(logicalAddress, true) === false)
     {
         this.memoryOutOfBoundsAccessHandler();
     }
@@ -315,7 +317,7 @@ Cpu.prototype.loadRegisterYFromMemory = function () {
     // Format the bytes as a logical address
     var logicalAddress = (parseInt(secondAddressFragment, 16) + parseInt(firstAddressFragment, 16));
     
-    if (_MemoryManager.validateAddress(logicalAddress) === false)
+    if (_MemoryManager.validateAddress(logicalAddress, true) === false)
     {
         this.memoryOutOfBoundsAccessHandler();
     }
@@ -354,7 +356,7 @@ Cpu.prototype.breakCall = function () {
     pcb.setRegisterX(_CPU.Xreg);
     pcb.setRegisterY(_CPU.Yreg);
     pcb.setFlagZ(_CPU.Zflag);
-    // TODO: Set status
+    pcb.setState("Terminated");
     
     UIUpdateManager.updateProcessMonitor(_CurrentExecutingProcess);
     
@@ -362,8 +364,15 @@ Cpu.prototype.breakCall = function () {
     _StdIn.advanceLine();
     _OsShell.putPrompt();
     
-    // Program requested to stop execution
-    _CPU.isExecuting = false;
+    if (_ReadyQueue.getNext())
+    {
+        _CPUScheduler.switchContext();
+    }
+    else
+    {
+        // Program requested to stop execution
+        _CPU.isExecuting = false;
+    }
 };
 
 /**
@@ -383,7 +392,7 @@ Cpu.prototype.compareByteInMemoryWithRegisterX = function () {
     // Format the bytes as a logical address
     var logicalAddress = (parseInt(secondAddressFragment, 16) + parseInt(firstAddressFragment, 16));
     
-    if (_MemoryManager.validateAddress(logicalAddress) === false)
+    if (_MemoryManager.validateAddress(logicalAddress, true) === false)
     {
         this.memoryOutOfBoundsAccessHandler();
     }
@@ -451,7 +460,7 @@ Cpu.prototype.incrementValueOfAByte = function () {
     // Format the bytes as a logical address
     var logicalAddress = (parseInt(secondAddressFragment, 16) + parseInt(firstAddressFragment, 16));
     
-    if (_MemoryManager.validateAddress(logicalAddress) === false)
+    if (_MemoryManager.validateAddress(logicalAddress, true) === false)
     {
         this.memoryOutOfBoundsAccessHandler();
     }
@@ -556,6 +565,7 @@ Cpu.prototype.cycle = function()
     // Begin the execution
     this.executeNextInstruction();
     
-    // TODO: Accumulate CPU usage and profiling statistics here.
-    // Do the real work here. Be sure to set this.isExecuting appropriately.
+    // Increment cycle count for Round Robin Scheduling
+    _RoundRobinCycleCount++;
+    
 };
