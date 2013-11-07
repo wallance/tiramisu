@@ -58,8 +58,6 @@ Scheduler.prototype.switchContext = function()
         _ReadyQueue.enqueue(_CurrentExecutingProcess);
     }
     
-    
-    
     // Switch processes.
     _CurrentExecutingProcess = _ReadyQueue.dequeue();
     
@@ -67,6 +65,7 @@ Scheduler.prototype.switchContext = function()
     
     var switchedPCB = _PCBFactory.getProcess(_CurrentExecutingProcess);
     
+    // Each time we switch processes, we must load the base and limit registers.
     _MemoryManager.systemMemory.setBaseRegister(switchedPCB.getBaseAddress());
     _MemoryManager.systemMemory.setLimitRegister(switchedPCB.getLimitAddress());
     
@@ -76,8 +75,8 @@ Scheduler.prototype.switchContext = function()
     _CPU.setCPUProperties( switchedPCB.getProgramCounter(),
                            switchedPCB.getAccumulator(),
                            switchedPCB.getRegisterX(),
-                           switchedPCB.getRegisterY,
-                           switchedPCB.setFlagZ() );
+                           switchedPCB.getRegisterY(),
+                           switchedPCB.getFlagZ() );
     
     // Switch back to user mode, from kernel mode.
     this.setMode(1);
