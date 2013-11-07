@@ -105,6 +105,15 @@ MemoryManager.prototype.clearMemoryBlock = function (blockId)
     {        
         // Mark block as available
         this.memoryBlocks[blockId]['available'] = true;
+        
+        // Re-init the whole block with 00
+        var baseAddress = this.memoryBlocks[blockId]['baseAddress'];
+        var limitAddress = this.memoryBlocks[blockId]['limitAddress'];
+        for (var i=baseAddress; i <= limitAddress; i++)
+        {
+            this.systemMemory.write(i, "00");
+            UIUpdateManager.updateMemoryMonitorAtAddress(i, _MemoryManager.readDataAtPhysicalAddress(i));
+        }
     }
     else {
         // TODO: Don't do this here
