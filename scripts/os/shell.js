@@ -572,8 +572,11 @@ function shellRunAll()
     {
         for (var i=0; i < processes.length; i++)
         {
-            //if (pid >= 0)
-            //{
+            // This check is a quick fix to not execute terminated processes.
+            // TODO: Redesign PCB Factory to eliminate this check.  Remove
+            // PCBs from resident list, upon termination.
+            if (processes[i].getState() !== "Terminated")
+            {
                 var pid = processes[i].getProcessID();
 
                 krnTrace("Executing processes: " + pid + ".");
@@ -584,7 +587,7 @@ function shellRunAll()
 
                 // Update the ready queue display.
                 UIUpdateManager.updateProcessMonitor(pid);
-            //}
+            }
         }
         
         // Schedule the next process in the ready queue by removing it.
