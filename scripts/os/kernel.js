@@ -40,7 +40,7 @@ function krnBootstrap()      // Page 8.
    _MemoryManager = new MemoryManager();
    _PCBFactory = new ProcessControlBlockFactory();
    
-   _ReadyQueue = new Queue();
+   _ReadyQueue = new ReadyQueue();
 
    // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
    krnTrace("Enabling the interrupts.");
