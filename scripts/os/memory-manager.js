@@ -71,17 +71,22 @@ MemoryManager.prototype.getNextAvailableBlock = function()
     return null;
 };
 
-MemoryManager.prototype.validateAddress = function(address)
+MemoryManager.prototype.validateAddress = function(address, isLogicalAddress)
 {
     var isValid = false;
+    
+    if (isLogicalAddress)
+    {
+        address = this.translateAddress(address, _CurrentExecutingProcess);
+    }
     
     var baseRegisterValue = this.systemMemory.getBaseRegister();
     var limitRegisterValue = this.systemMemory.getLimitRegister();
     
     var addressAsDecimal = parseInt(address, 10);
     
-    //if ( (addressAsDecimal >= baseRegisterValue) && (addressAsDecimal <= limitRegisterValue) )
-    if ( (addressAsDecimal >= 180) && (addressAsDecimal <= limitRegisterValue) )
+    if ( (addressAsDecimal >= baseRegisterValue) && (addressAsDecimal <= limitRegisterValue) )
+    //if ( (addressAsDecimal >= 180) && (addressAsDecimal <= limitRegisterValue) )
     {
         isValid = true;
     }
