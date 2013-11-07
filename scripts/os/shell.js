@@ -536,13 +536,18 @@ function shellRunProgram(args)
         if (pcb !== null)
         {
             // Add process PCB to ready queue.
-            _ReadyQueue.enqueue(pcb);
-            pcb.setStatus("Ready");
+            _ReadyQueue.enqueue(pid);
+            pcb.setState("Ready");
+            
+            _ReadyQueue.dequeue();
+            
+            _CurrentExecutingProcess = pid;
+            _CPU.isExecuting = true;
             
             // Be usre to remove the PCB from the resident process list
-            _PCBFactory.residentProcesses[pcb.getProcessId()] = null;
+            //_PCBFactory.residentProcesses[pcb.getProcessID()] = null;
             
-            krnExecuteProcess(pid);            
+            //krnExecuteProcess(pcb.getProcessID());            
         }
         else
         {
@@ -562,22 +567,41 @@ function shellRunProgram(args)
 function shellRunAll()
 {
     var processes = _PCBFactory.getProcesses();
-    for (var i=0; i < processes.length; i++)
+    
+    if (processes.length > 0)
     {
-        //if (pid >= 0)
-        //{
-            var pid = processes[i].getProcessID();
+        for (var i=0; i < processes.length; i++)
+        {
+            //if (pid >= 0)
+            //{
+                var pid = processes[i].getProcessID();
 
-            krnTrace("Executing processes: " + pid + ".");
+                krnTrace("Executing processes: " + pid + ".");
 
-            _ReadyQueue.enqueue(pid);
-            processes[i].setState("Ready");
-            //processes[i] = null;
-            
-            // Update the ready queue display.
-            UIUpdateManager.updateProcessMonitor(pid);
-        //}
+                _ReadyQueue.enqueue(pid);
+                processes[i].setState("Ready");
+                //processes[i] = null;
+
+                // Update the ready queue display.
+                UIUpdateManager.updateProcessMonitor(pid);
+            //}
+        }
+        
+        // Schedule the next process in the ready queue by removing it.
+        _CurrentExecutingProcess = _ReadyQueue.dequeue();
+        
+        _MemoryManager.systemMemory.setBaseRegister(processes[0].getBaseAddress());
+        _MemoryManager.systemMemory.setLimitRegister(processes[0].getLimitAddress());
+        
+        _CPU.isExecuting = true;
     }
+    else
+    {
+        _StdIn.putText("There are no processes to run.  Please load at least one process.");
+    }
+    
+    
+    
 }
 
 /**
