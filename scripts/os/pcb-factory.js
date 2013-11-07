@@ -98,7 +98,20 @@ ProcessControlBlockFactory.prototype.getProcess = function(pid)
     }
 };
 
+/**
+ * Retrieves all the resident processes.
+ * @returns {Array} List of processes
+ */
 ProcessControlBlockFactory.prototype.getProcesses = function()
 {
     return this.residentProcesses;
+};
+
+/**
+ * Removes the specified process from the resident list.
+ * @returns {undefined}
+ */
+ProcessControlBlockFactory.prototype.removeProcessFromResidentList = function(pid)
+{
+    throw new Error ("Not implemented yet!");
 };
