@@ -19,16 +19,14 @@ Scheduler.prototype.schedule = function()
     // Retrieve the Process Control Block (PCB).
     var currentProcess = _PCBFactory.getProcess(_CurrentExecutingProcess);
     
+    // Executes when there are multiple processes AND the RR cycle count has
+    // been reached.
     if ( (_RoundRobinCycleCount > _RoundRobinQuantum) &&
          (_ReadyQueue.getNext() !== null) &&
          (_ReadyQueue.getNext() > -1) )
     {
         // Switch when the process has been executed the same number of times
         // as the quantum.
-        this.switchContext();
-    }
-    else if (currentProcess.getState() === "Terminated")
-    {
         this.switchContext();
     }
 };
@@ -69,7 +67,7 @@ Scheduler.prototype.switchContext = function()
     _MemoryManager.systemMemory.setBaseRegister(switchedPCB.getBaseAddress());
     _MemoryManager.systemMemory.setLimitRegister(switchedPCB.getLimitAddress());
     
-    krnTrace("Loding CPU registers for process " + switchedPCB.getProcessID() + ".");
+    krnTrace("Loading CPU registers for process " + switchedPCB.getProcessID() + ".");
     
     // Load the CPU with the value of the process' registers.
     _CPU.setCPUProperties( switchedPCB.getProgramCounter(),
@@ -81,7 +79,7 @@ Scheduler.prototype.switchContext = function()
     // Switch back to user mode, from kernel mode.
     this.setMode(1);
     
-    // After context switching, reset the RR cycle count for the next process
+    // After context switching, reset the RR cycle count for the next process.
     _RoundRobinCycleCount = 1;
 };
 
