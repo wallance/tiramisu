@@ -376,9 +376,9 @@ Cpu.prototype.breakCall = function () {
         // Reset the CPU registers.
         _CPU.setCPUProperties(0, 0, 0, 0, 0);
         
-        // Make the memory block available again.
-        _MemoryManager.clearMemoryBlock(pcb.getMemoryBlock());
     }
+    // Make the memory block available again.
+    _MemoryManager.clearMemoryBlock(pcb.getMemoryBlock());
 };
 
 /**
