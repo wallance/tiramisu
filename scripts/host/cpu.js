@@ -334,8 +334,7 @@ Cpu.prototype.loadRegisterYFromMemory = function () {
  * 
  * This operation has no effect on the program.  Moves onto
  * the next instruction. 
- */ 
-
+ */
 Cpu.prototype.noOperation = function () {
     // We are done executing this op code
     this.incrementProgramCounter();
@@ -372,6 +371,9 @@ Cpu.prototype.breakCall = function () {
     {
         // Program requested to stop execution
         _CPU.isExecuting = false;
+        _CurrentExecutingProcess = null;
+        _CPU.setCPUProperties(0, 0, 0, 0, 0);
+        
     }
 };
 
@@ -497,8 +499,9 @@ Cpu.prototype.systemCall = function () {
         // This is how we know when we reached the end of the system call.
         var terminationIndicator = "00";
         
-        // The contents of register Y is an address, translate it.
-        var logicalAddressForRegY = _MemoryManager.translateAddress(_CPU.Yreg, _CurrentExecutingProcess);
+        // For readability and simplicity, get the contents of register Y
+        // This serves as the logical address.
+        var logicalAddressForRegY = _CPU.Yreg;
         
         var currentByte = _MemoryManager.readDataAtLogicalAddress(logicalAddressForRegY, _CurrentExecutingProcess);
         
@@ -519,6 +522,8 @@ Cpu.prototype.systemCall = function () {
         // Output the entire string
         _StdIn.putText(textOutput);
     }    
+    _StdIn.advanceLine();
+    _OsShell.putPrompt();
     // We are done executing this op code
     this.incrementProgramCounter();
 };
