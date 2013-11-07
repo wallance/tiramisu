@@ -95,12 +95,15 @@ function krnOnCPUClockPulse()
     // or if there is a process on the ready queue.
     else if (_CPU.isExecuting || _ReadyQueue.getSize() > 0)
     {
+        // Save the pid, so when the program finishes, we remember which one it was.
+        var pid = _CurrentExecutingProcess;
+        
         // Execute a single cycle
         _CPU.cycle();
         
         // Refresh the CPU display and process monitor
         UIUpdateManager.updateCPUMonitor();
-        UIUpdateManager.updateProcessMonitor(_CurrentExecutingProcess);
+        UIUpdateManager.updateProcessMonitor(pid);
         
         // Only update memory when CPU is executing?
         //UIUpdateManager.updateMemoryMonitorAtAddress();
@@ -262,7 +265,8 @@ function krnExecuteProcess(pid) {
     var pcb = _PCBFactory.getProcess(pid);
     
     // PCB will be null if it does not exist
-    if (pcb !== null) {
+    if (pcb !== null)
+    {
         
         krnTrace("Executing process with a PID of " + pid + '.');        
         
@@ -272,8 +276,9 @@ function krnExecuteProcess(pid) {
         // Starts executing on the next clock pulse.
         _CPU.isExecuting = true;
         
-    } else {
-        _StdIn.putText('Process with an ID ' + pid + 'does not exist.');
+    } else
+    {
+        _StdIn.putText('Process with an ID ' + pid + ' does not exist.');
         return;
     }
 }
