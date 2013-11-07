@@ -158,12 +158,14 @@ footer {
 }
 
 
-#process-monitor {
-    width: 727px;
+#process-monitor,
+#ready-queue-monitor {
+    width: 400px;
     float: left;
 }
 
-#process-monitor .title {
+#process-monitor .title,
+#ready-queue-monitor .title {
     
     font-weight: 600;
 }
@@ -172,17 +174,22 @@ th {
     font-weight: 600;
 }
 
-#process-monitor tr,  #process-monitor td {
+#process-monitor tr, 
+#process-monitor td
+#ready-queue-monitor tr, 
+#ready-queue-monitor td {
     width: 80px;
     text-align: center;
 }
 
-#process-monitor table {
+#process-monitor table,
+#ready-queue-monitor table {
     font-family: 'Source Sans Pro', sans-serif;
     font-size: 14px;
     font-weight: 400;
     text-transform: uppercase;
     border-spacing: 0px;
+    border: 1px solid #000;
 }
 
 #divUserProgramInput {
