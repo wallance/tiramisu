@@ -116,6 +116,65 @@ UIUpdateManager.creareNewProcessRow = function (pcb, htmlID) {
     return processRow;
 };
 
+UIUpdateManager.updateReadyQueue = function(pid) {
+    var currentPcb = _PCBFactory.getProcess(pid);
+    
+    // Build the ID tag for use in the HTML attribute. Prepend # for jQuery
+    // selection.
+    var processIDTag = '#queue-item-' + currentPcb.getProcessID();
+    
+    // Element with process ID already exists, update it.
+    if ( $(processIDTag).length ) {
+        $(processIDTag + ' .pm-pid').html( currentPcb.getProcessID() );
+        $(processIDTag + ' .pm-state').html( currentPcb.getState() );
+        $(processIDTag + ' .pm-pc').html( this.baseTenToBaseSixteen(currentPcb.getProgramCounter(), true) );
+        $(processIDTag + ' .pm-acc').html( this.baseTenToBaseSixteen(currentPcb.getAccumulator(), true) );
+        $(processIDTag + ' .pm-x-reg').html( this.baseTenToBaseSixteen(currentPcb.getRegisterX(), true) );
+        $(processIDTag + ' .pm-y-reg').html( this.baseTenToBaseSixteen(currentPcb.getRegisterY(), true) );
+        $(processIDTag + ' .pm-z-flag').html( this.baseTenToBaseSixteen(currentPcb.getFlagZ(), true) );
+        $(processIDTag + ' .pm-base-address').html( this.baseTenToBaseSixteen(currentPcb.getBaseAddress(), true) );
+        $(processIDTag + ' .pm-limit-address').html( this.baseTenToBaseSixteen(currentPcb.getLimitAddress(), true) );
+    }
+    // Element without the process ID exists, we need to create it.
+    else {
+        var row = this.createNewReadyQueueRow(currentPcb, processIDTag);
+        
+        //Add it to the display
+        row.appendTo( $('#ready-queue-monitor table tbody') );
+    }
+};
+
+UIUpdateManager.createNewReadyQueueRow = function (pcb, htmlID) {    
+    
+    // Create new table row element, using the html ID.  Don't forget to
+    // remove the first character, which is the # character.
+    var readyQueueRow = $('<tr>').attr('id', htmlID.substring(1));
+    
+    $('<td>').addClass('pm-pid').html( pcb.getProcessID() ).appendTo(readyQueueRow);
+    $('<td>').addClass('pm-state').html( pcb.getState() ).appendTo(readyQueueRow);
+    $('<td>').addClass('pm-pc').html( this.baseTenToBaseSixteen(pcb.getProgramCounter(), true) ).appendTo(readyQueueRow);
+    
+    $('<td>').addClass('pm-acc').html( this.baseTenToBaseSixteen(pcb.getAccumulator(), true) ).appendTo(readyQueueRow);
+    $('<td>').addClass('pm-x-reg').html( this.baseTenToBaseSixteen(pcb.getRegisterX(), true) ).appendTo(readyQueueRow);
+    $('<td>').addClass('pm-y-reg').html( this.baseTenToBaseSixteen(pcb.getRegisterX(), true) ).appendTo(readyQueueRow);
+    
+    $('<td>').addClass('pm-z-flag').html( this.baseTenToBaseSixteen(pcb.getFlagZ(), true) ).appendTo(readyQueueRow);
+    $('<td>').addClass('pm-base-address').html( this.baseTenToBaseSixteen(pcb.getBaseAddress(), true) ).appendTo(readyQueueRow);
+    $('<td>').addClass('pm-limit-address').html( this.baseTenToBaseSixteen(pcb.getLimitAddress(), true) ).appendTo(readyQueueRow);
+    
+    return readyQueueRow;
+};
+
+/**
+ * Removes the top row of the ready queue monitor.
+ * @returns {undefined}
+ */
+UIUpdateManager.dequeueItemFromReadyQueueMonitor = function () {
+    // Nth child is 2 because 1 would remove the header row.
+    $('#ready-queue-monitor table tbody tr:nth-child(2)').remove();    
+};
+
+
 UIUpdateManager.baseTenToBaseSixteen = function(baseTen, shouldPrependNotation) {
     var baseSixteen = baseTen.toString(16).toUpperCase();
     if (baseSixteen.length === 1) { baseSixteen = '0' + baseSixteen; };
