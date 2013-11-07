@@ -434,9 +434,10 @@ Cpu.prototype.branchXBytesIfZFlagIsZero = function () {
         var pcb = _PCBFactory.getProcess(_CurrentExecutingProcess);
         
         // Ensure branching out of current process does not occur
-        if (this.PC > pcb.getLimitAddress()) {
+        if(_MemoryManager.translateAddress(this.PC, pcb.getProcessID()) > pcb.getLimitAddress())
+        {
             this.PC = this.PC - SYSTEM_MEMORY_BLOCK_SIZE;
-        };
+        }
         
         this.incrementProgramCounter();
     } else {
