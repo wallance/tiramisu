@@ -156,7 +156,7 @@ function shellInit() {
     
     // top
     sc = new ShellCommand();
-    sc.command = "run";
+    sc.command = "top";
     sc.description = "Shows currently running processes.";
     sc.function = shellTop;
     this.commandList[this.commandList.length] = sc;
@@ -663,7 +663,7 @@ function shellTop()
     var processes = _PCBFactory.getProcesses();
     for (var i=0; i < processes.length; i++) {
         _Console.advanceLine();
-        var processInfo = "Process #" + i + " with PID of: " + processes[i].getProcessID + ".";
+        var processInfo = "Process #" + i + " with PID of: " + processes[i].getProcessID() + ".";
         _StdIn.putText(processInfo);
     }
 }
