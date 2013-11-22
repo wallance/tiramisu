@@ -160,6 +160,65 @@ function shellInit() {
     sc.description = "Shows currently running processes.";
     sc.function = shellTop;
     this.commandList[this.commandList.length] = sc;
+    
+    // File System Commands
+    // 
+    // create
+    sc = new ShellCommand();
+    sc.command = "create";
+    sc.description = "Shows currently running processes.";
+    sc.function = shellCreateFile;
+    this.commandList[this.commandList.length] = sc;
+    
+    // read
+    sc = new ShellCommand();
+    sc.command = "read";
+    sc.description = "Shows currently running processes.";
+    sc.function = shellReadFile;
+    this.commandList[this.commandList.length] = sc;
+    
+    // write
+    sc = new ShellCommand();
+    sc.command = "write";
+    sc.description = "Shows currently running processes.";
+    sc.function = shellWriteFile;
+    this.commandList[this.commandList.length] = sc;
+    
+    // delete
+    sc = new ShellCommand();
+    sc.command = "delete";
+    sc.description = "Shows currently running processes.";
+    sc.function = shellDeleteFile;
+    this.commandList[this.commandList.length] = sc;
+    
+    // format
+    sc = new ShellCommand();
+    sc.command = "format";
+    sc.description = "Shows currently running processes.";
+    sc.function = shellFormat;
+    this.commandList[this.commandList.length] = sc;
+    
+    // ls
+    sc = new ShellCommand();
+    sc.command = "ls";
+    sc.description = "Shows currently running processes.";
+    sc.function = shellListFiles;
+    this.commandList[this.commandList.length] = sc;
+    
+    // setschedule
+    sc = new ShellCommand();
+    sc.command = "setschedule";
+    sc.description = "Shows currently running processes.";
+    sc.function = shellSetSchedule;
+    this.commandList[this.commandList.length] = sc;
+    
+    // getschedule
+    sc = new ShellCommand();
+    sc.command = "getschedule";
+    sc.description = "Shows currently running processes.";
+    sc.function = shellGetSchedule;
+    this.commandList[this.commandList.length] = sc;
+    
     //
     // Display the initial prompt.
     this.putPrompt();
@@ -729,4 +788,44 @@ function displayCommandHistory(keyCode)
 		_Console.buffer = lastCommand;
 		_Console.putText(lastCommand);
 	}
+}
+
+function  shellCreateFile(args)
+{
+    
+}
+
+function shellReadFile(args)
+{
+    
+}
+
+function shellWriteFile(args)
+{
+    
+}
+
+function shellDeleteFile(args)
+{
+    
+}
+
+function shellFormat()
+{
+    
+}
+
+function shellListFiles()
+{
+    
+}
+
+function shellSetSchedule(args)
+{
+    
+}
+
+function shellGetSchedule()
+{
+    
 }
