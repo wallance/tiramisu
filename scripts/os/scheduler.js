@@ -92,7 +92,7 @@ Scheduler.prototype.setMode = function(mode)
 
 Scheduler.prototype.getAlgorithm = function(algorithm)
 {
-    if (this.algorithms[algorithm] !== null)
+    if (typeof this.algorithms[algorithm] !== 'undefined')
     {
         return this.algorithms[algorithm];
     } else {
