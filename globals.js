@@ -12,7 +12,7 @@
 // Global CONSTANTS
 //
 var APP_NAME = "Tiramisu";  // 'cause I was at a loss for a better name.
-var APP_VERSION = "0.03";   // What did you expect?
+var APP_VERSION = "0.04";   // What did you expect?
 
 var CPU_CLOCK_INTERVAL = 100;   // This is in ms, or milliseconds, so 1000 = 1 second.
 
@@ -47,6 +47,7 @@ var _CurrentExecutingProcess = null;
 var _CPUScheduler = null;
 var _RoundRobinCycleCount = null;
 var _RoundRobinQuantum = 6;
+var _SchedulingAlgorithm = 'rr';
 
 var _Canvas = null;               // Initialized in hostInit().
 var _DrawingContext = null;       // Initialized in hostInit().
