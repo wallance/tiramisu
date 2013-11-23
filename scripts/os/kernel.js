@@ -36,6 +36,12 @@ function krnBootstrap()      // Page 8.
    krnKeyboardDriver.driverEntry();                    // Call the driverEntry() initialization routine.
    krnTrace(krnKeyboardDriver.status);
    
+   // Load the OS File System Device Driver
+   krnTrace("Loading the file system device driver.");
+   krnFileSystemDriver = new DeviceDriverFileSystem();     // Construct it.  TODO: Should that have a _global-style name?
+   krnFileSystemDriver.driverEntry();                    // Call the driverEntry() initialization routine.
+   krnTrace(krnFileSystemDriver.status);
+   
    // Initalize memory and the PCB Factory
    _MemoryManager = new MemoryManager();
    _PCBFactory = new ProcessControlBlockFactory();
@@ -57,6 +63,22 @@ function krnBootstrap()      // Page 8.
    if (_GLaDOS) {
       _GLaDOS.afterStartup();
    }
+}
+
+/**
+ * Checks to see if HTML5 Local Storage is supported in the current web browser.
+ * @returns {Boolean|window|String} false if it is not supported.
+ */
+function isHtmlStorageSupported() {
+    // Uses the detection code from here: http://diveintohtml5.info/detect.html
+    try
+    {
+        return 'localStorage' in window && window['localStorage'] !== null;
+    }
+    catch(e)
+    {
+        return false;
+    }
 }
 
 function krnShutdown()
