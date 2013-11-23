@@ -822,7 +822,21 @@ function shellListFiles()
 
 function shellSetSchedule(args)
 {
-    
+    if (args.length > 0)
+    {
+        if (_CPUScheduler.getAlgorithm(args[0]) !== null)
+        {
+            _SchedulingAlgorithm = args[0];
+        }
+        else
+        {
+            _StdIn.putText("Invalid scheduling algorithm.");
+        }
+    }
+    else
+    {
+        _StdIn.putText("Usage: <rr | fcfs | priority> Choose an algorithm.");
+    }
 }
 
 function shellGetSchedule()
