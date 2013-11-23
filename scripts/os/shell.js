@@ -827,5 +827,5 @@ function shellSetSchedule(args)
 
 function shellGetSchedule()
 {
-    
+    _StdIn.putText("The current CPU Scheudling algorithm is " + _CPUScheduler.getAlgorithm(_SchedulingAlgorithm) + ".");
 }
