@@ -5,7 +5,9 @@
  */
 
 function Scheduler()
-{    
+{
+    this.algorithms = {'rr': 'Round Robin', 'fcfs' : 'First Come, First-Served', 'priority' : 'Priority'};
+    
     this.init();
 };
 
@@ -86,4 +88,14 @@ Scheduler.prototype.switchContext = function()
 Scheduler.prototype.setMode = function(mode)
 {
     _Mode = mode;
+};
+
+Scheduler.prototype.getAlgorithm = function(algorithm)
+{
+    if (this.algorithms[algorithm] !== null)
+    {
+        return this.algorithms[algorithm];
+    } else {
+        return null;
+    }
 };
