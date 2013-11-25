@@ -36,11 +36,18 @@ function krnBootstrap()      // Page 8.
    krnKeyboardDriver.driverEntry();                    // Call the driverEntry() initialization routine.
    krnTrace(krnKeyboardDriver.status);
    
-   // Load the OS File System Device Driver
-   krnTrace("Loading the file system device driver.");
-   krnFileSystemDriver = new DeviceDriverFileSystem();     // Construct it.  TODO: Should that have a _global-style name?
-   krnFileSystemDriver.driverEntry();                    // Call the driverEntry() initialization routine.
-   krnTrace(krnFileSystemDriver.status);
+   if (isHtmlStorageSupported() != false)
+   {
+        // Load the OS File System Device Driver
+        krnTrace("Loading the file system device driver.");
+        krnFileSystemDriver = new DeviceDriverFileSystem();     // Construct it.  TODO: Should that have a _global-style name?
+        krnFileSystemDriver.driverEntry();                    // Call the driverEntry() initialization routine.
+        krnTrace(krnFileSystemDriver.status);
+   }
+   else
+   {
+        krnTrapError("HTML5 Storage is not supported.  It is required to run this operating system.");
+   }
    
    // Initalize memory and the PCB Factory
    _MemoryManager = new MemoryManager();
