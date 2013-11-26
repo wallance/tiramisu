@@ -18,23 +18,53 @@ function DeviceDriverFileSystem()
     this.BLOCK_SIZE_IN_BYTES = 64;
     this.BLOCKS_PER_SECTOR = 7;
     
+    this.MAX_TSB_KEY = null;
+    
     this.hardDisk = sessionStorage;
 };
 
 DeviceDriverFileSystem.prototype.driverEntry = function()
-{
+{   
+    var key = this.TRACK_COUNT.toString() + this.SECTOR_COUNT.toString() + this.BLOCKS_PER_SECTOR.toString();
+    
+    this.MAX_TSB_KEY = parseInt(key);
+    
+    this.format();
+    
     // Initialization routine for this, the kernel-mode Keyboard Device Driver.
     this.status = "loaded";
-    // More?
 };
 
 DeviceDriverFileSystem.prototype.format = function()
 {
     this.hardDisk.clear();
     
+    for (var i=0; i <= this.MAX_TSB_KEY; i++)
+    {
+        var tsbKey = this.convertToTSBKey(i);
+        
+        var dataValue = this.blockAsString(0, -1, -1, -1, '');
+        
+        this.hardDisk.setItem(tsbKey, dataValue);
+    }
+    
+    // Set up the MBR block.
+    this.writeDataToTSB(0, 0, 0, "MBR");
+    
 };
 
-DeviceDriverFileSystem.prototype.translateAsKey = function(track, sector, block)
+// The padding functionality is taken from:
+// http://stackoverflow.com/questions/10073699/pad-a-number-with-leading-zeros-in-javascript
+DeviceDriverFileSystem.prototype.convertToTSBKey = function(i) {
+    var padKey = function pad(n, width, z) {
+        z = z || '0';
+        n = n + '';
+        return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+    };
+    return padKey(i, 3);
+};
+
+/*DeviceDriverFileSystem.prototype.translateAsKey = function(track, sector, block)
 {
     // Helps ensure the required parameters are valid.
     if ( (track === null) ||
@@ -47,16 +77,24 @@ DeviceDriverFileSystem.prototype.translateAsKey = function(track, sector, block)
         throw 'Unable to translate TSB.  One or more values are null and or undefined.';
     }
     return track.toString() + sector.toString() + block.toString();
-};
+};*/
+
+DeviceDriverFileSystem.prototype.blockAsString = function(isBlockOccupied, track, sector, block, data)
+{
+    var actualData = this.dataWithPadding(data);
+    var blockDataAsArray = [isBlockOccupied, track, sector, block, actualData];
+    return JSON.stringify(blockDataAsArray);
+}
 
 DeviceDriverFileSystem.prototype.readTSB = function(track, sector, block)
 {
-    return this.hardDisk.getItem(this.translateAsKey(track, sector, block));
+    return this.hardDisk.getItem(this.convertToTSBKey(track, sector, block));
 };
 
-DeviceDriverFileSystem.prototype.writeToTSB = function(track, sector, block, data)
+DeviceDriverFileSystem.prototype.writeDataToTSB = function(track, sector, block, data)
 {
-    this.hardDisk.setItem(this.translateAsKey(track, sector, block), data);
+    var blockAsString = this.blockAsString(1, -1, -1, -1, this.dataWithPadding(data));
+    this.hardDisk.setItem(this.convertToTSBKey(track, sector, block), blockAsString);
 };
 
 DeviceDriverFileSystem.prototype.deleteObjectAtPath = function()
@@ -67,4 +105,14 @@ DeviceDriverFileSystem.prototype.deleteObjectAtPath = function()
 DeviceDriverFileSystem.prototype.createNewFile = function()
 {
     
+};
+
+DeviceDriverFileSystem.prototype.dataWithPadding = function(actualData)
+{
+    for (var i=actualData.length; i < 60; i++)
+    {
+        actualData = actualData + '-';
+    }
+    
+    return actualData;
 };
