@@ -205,18 +205,16 @@ UIUpdateManager.initalizeFileSystemMonitor = function ()
         var value = krnFileSystemDriver.hardDisk.getItem(tsbKey);
         
         // 1 row of 8 blocks
-        //var tableRow = $('<tr>');
+        var tableRow = $('<tr>');
         
         // The starting address label
-        //$('<th>').html( '0x' + this.baseTenToBaseSixteen(address, false)).appendTo(tableRow);
+        $('<th>').html(tsbKey).appendTo(tableRow);
         
-        // Create all 8 blocks
-        /*for (var j = 0; j < 8; j++) {
-            $('<td id="mem-address-' + this.baseTenToBaseSixteen( (address + j), false) + '">').html('00').appendTo(tableRow);
-        }
-        $(tableRow).appendTo(tableBody);*/
+
+        $('<td id="tsb-key-' + tsbKey + '">').html(value).appendTo(tableRow);
+        
+        $(tableRow).appendTo($('#file-system-monitor table tbody'));
     }
-    $(tableBody).appendTo($('#file-system-monitor table'));
     
 };
 
