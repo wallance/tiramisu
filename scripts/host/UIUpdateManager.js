@@ -169,17 +169,59 @@ UIUpdateManager.createNewReadyQueueRow = function (pcb, htmlID) {
  * Removes the top row of the ready queue monitor.
  * @returns {undefined}
  */
-UIUpdateManager.dequeueItemFromReadyQueueMonitor = function () {
+UIUpdateManager.dequeueItemFromReadyQueueMonitor = function ()
+{
     // Nth child is 2 because 1 would remove the header row.
     $('#ready-queue-monitor table tbody tr:nth-child(2)').remove();    
 };
 
-
-UIUpdateManager.baseTenToBaseSixteen = function(baseTen, shouldPrependNotation) {
+UIUpdateManager.baseTenToBaseSixteen = function(baseTen, shouldPrependNotation)
+{
     var baseSixteen = baseTen.toString(16).toUpperCase();
     if (baseSixteen.length === 1) { baseSixteen = '0' + baseSixteen; };
     
     // For display purposes, we may want to prepend: 0x.
     if (shouldPrependNotation) { baseSixteen = '0x' + baseSixteen; };
     return baseSixteen;
+};
+
+//File System GUI
+
+/**
+ * Creates the HTML markup for the file system monitor and adds it to the page.
+ * Note: This method should only be called after the File System driver has been
+ * loaded and the disk has been formatted.
+ * @returns {undefined}
+ */
+UIUpdateManager.initalizeFileSystemMonitor = function ()
+{
+    // Holds all the row elements
+    var tableBody = $('<tbody>');
+    
+    // Each row has eight "blocks"
+    for (var i = 0; i < krnFileSystemDriver.hardDisk.length; i++) {
+        
+        var tsbKey = krnFileSystemDriver.hardDisk.key(i);
+        var value = krnFileSystemDriver.hardDisk.getItem(tsbKey);
+        
+        // 1 row of 8 blocks
+        //var tableRow = $('<tr>');
+        
+        // The starting address label
+        //$('<th>').html( '0x' + this.baseTenToBaseSixteen(address, false)).appendTo(tableRow);
+        
+        // Create all 8 blocks
+        /*for (var j = 0; j < 8; j++) {
+            $('<td id="mem-address-' + this.baseTenToBaseSixteen( (address + j), false) + '">').html('00').appendTo(tableRow);
+        }
+        $(tableRow).appendTo(tableBody);*/
+    }
+    $(tableBody).appendTo($('#file-system-monitor table'));
+    
+};
+
+UIUpdateManager.updateFileSystemMonitorAtTSB = function(track, sector, block)
+{
+    krnFileSystemDriver.readTSB(track, sector, block);
+    
 };
