@@ -812,7 +812,21 @@ function shellDeleteFile(args)
 
 function shellFormat()
 {
-    
+    if (krnFileSystemDriver !== null)
+    {
+        if (krnFileSystemDriver.format())
+        {
+            _StdIn.putText("Successfully formatted the hard disk.");
+        }
+        else
+        {
+            _StdIn.putText("Failed to format the hard disk.");
+        }
+    }
+    else
+    {
+        _StdIn.putText("Failed to format the hard disk. The FS driver has not been initialized.");
+    }
 }
 
 function shellListFiles()
