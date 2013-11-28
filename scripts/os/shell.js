@@ -166,56 +166,56 @@ function shellInit() {
     // create
     sc = new ShellCommand();
     sc.command = "create";
-    sc.description = "Shows currently running processes.";
+    sc.description = "<filename> Creates a new file with the given filename.";
     sc.function = shellCreateFile;
     this.commandList[this.commandList.length] = sc;
     
     // read
     sc = new ShellCommand();
     sc.command = "read";
-    sc.description = "Shows currently running processes.";
+    sc.description = "<filename> Reads the contents of the specified filename.";
     sc.function = shellReadFile;
     this.commandList[this.commandList.length] = sc;
     
     // write
     sc = new ShellCommand();
     sc.command = "write";
-    sc.description = "Shows currently running processes.";
+    sc.description = "<filename> \"<data>\" Writes the data inside the quotes to the filename .";
     sc.function = shellWriteFile;
     this.commandList[this.commandList.length] = sc;
     
     // delete
     sc = new ShellCommand();
     sc.command = "delete";
-    sc.description = "Shows currently running processes.";
+    sc.description = "<filename> Deletes the specified file.";
     sc.function = shellDeleteFile;
     this.commandList[this.commandList.length] = sc;
     
     // format
     sc = new ShellCommand();
     sc.command = "format";
-    sc.description = "Shows currently running processes.";
+    sc.description = "Formats the hard drive.";
     sc.function = shellFormat;
     this.commandList[this.commandList.length] = sc;
     
     // ls
     sc = new ShellCommand();
     sc.command = "ls";
-    sc.description = "Shows currently running processes.";
+    sc.description = "Lists all the files on the hard drive.";
     sc.function = shellListFiles;
     this.commandList[this.commandList.length] = sc;
     
     // setschedule
     sc = new ShellCommand();
     sc.command = "setschedule";
-    sc.description = "Shows currently running processes.";
+    sc.description = "<rr|fcfs|priority> Sets the CPU algorithm.";
     sc.function = shellSetSchedule;
     this.commandList[this.commandList.length] = sc;
     
     // getschedule
     sc = new ShellCommand();
     sc.command = "getschedule";
-    sc.description = "Shows currently running processes.";
+    sc.description = "Retrieves the current CPU scheduling algorithm.";
     sc.function = shellGetSchedule;
     this.commandList[this.commandList.length] = sc;
     
