@@ -64,21 +64,6 @@ DeviceDriverFileSystem.prototype.convertToTSBKey = function(i) {
     return padKey(i, 3);
 };
 
-/*DeviceDriverFileSystem.prototype.translateAsKey = function(track, sector, block)
-{
-    // Helps ensure the required parameters are valid.
-    if ( (track === null) ||
-         (sector !== null) ||
-         (block !== null) ||
-         (typeof track === 'undefined') ||
-         (typeof sector !== 'undefined') ||
-         (typeof block !== 'undefined') )
-    {
-        throw 'Unable to translate TSB.  One or more values are null and or undefined.';
-    }
-    return track.toString() + sector.toString() + block.toString();
-};*/
-
 DeviceDriverFileSystem.prototype.blockAsString = function(isBlockOccupied, track, sector, block, data)
 {
     var actualData = this.dataWithPadding(data);
