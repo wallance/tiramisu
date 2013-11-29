@@ -202,20 +202,26 @@ UIUpdateManager.initalizeFileSystemMonitor = function ()
         var value = krnFileSystemDriver.hardDisk.getItem(tsbKey);
         
         // 1 row of 8 blocks
-        var tableRow = $('<tr>');
+        var tableRow = $('<tr id="tsb-key-' + tsbKey + '">');
         
         // The starting address label
         $('<th>').html(tsbKey).appendTo(tableRow);
         
-
-        $('<td id="tsb-key-' + tsbKey + '">').html(value).appendTo(tableRow);
+        $('<td class="occupied">').appendTo(tableRow);
+        $('<td class="t-link">').appendTo(tableRow);
+        $('<td class="s-link">').appendTo(tableRow);
+        $('<td class="b-link">').appendTo(tableRow);
+        $('<td class="data">').appendTo(tableRow);
         
         $(tableRow).appendTo($('#file-system-monitor table tbody'));
+        
+        UIUpdateManager.updateFileSystemMonitorAtTSB(tsbKey);
     }
 };
 
 UIUpdateManager.updateFileSystemMonitorAtTSB = function(tsbKey)
 {
+    console.log("Called with key: " + tsbKey);
     krnFileSystemDriver.readTSB(track, sector, block);
     
     tsbKey = tsbKey.split();
@@ -223,6 +229,13 @@ UIUpdateManager.updateFileSystemMonitorAtTSB = function(tsbKey)
     var sector = tsbKey[1];
     var block = tsbKey[2];
     
-    $('#tsb-key-' + tsbKey).html(krnFileSystemDriver.readTSB(track, sector, block))
+    var tsbContents = krnFileSystemDriver.readTSB(track, sector, block);
+    console.log(tsbContents[0]);
+    
+    $('#tsb-key-' + tsbKey + ' td.occupied').html(tsbContents[0]);
+    $('#tsb-key-' + tsbKey + ' td.t-link').html(tsbContents[1]);
+    $('#tsb-key-' + tsbKey + ' td.s-link').html(tsbContents[2]);
+    $('#tsb-key-' + tsbKey + ' td.b-link').html(tsbContents[3]);
+    $('#tsb-key-' + tsbKey + ' td.data').html(tsbContents[4]);
     
 };
