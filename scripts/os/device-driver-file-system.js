@@ -16,18 +16,26 @@ function DeviceDriverFileSystem()
     this.TRACK_COUNT = 3;
     this.SECTOR_COUNT = 7;
     this.BLOCK_SIZE_IN_BYTES = 64;
-    this.BLOCKS_PER_SECTOR = 7;
+    this.BLOCK_COUNT = 7;
     this.RESERVED_BYTE_COUNT = 4;
-    
     this.MAX_TSB_KEY = null;
     this.MAX_DATA_SIZE_IN_BYTES = this.BLOCK_SIZE_IN_BYTES - this.RESERVED_BYTE_COUNT;
+    this.MBR_TSB_KEY = this.convertToTSBKey(0);
+    
+    // Master File Table (MFT) constants
+    this.MFT_START_TSB_KEY = this.convertToTSBKey(1);
+    this.MFT_END_TSB_KEY = this.convertToTSBKey(77);
     
     this.hardDisk = sessionStorage;
 };
 
+/**
+ * The driver initialization method. This should be called before any other
+ * method is called.
+ */
 DeviceDriverFileSystem.prototype.driverEntry = function()
 {   
-    var key = this.TRACK_COUNT.toString() + this.SECTOR_COUNT.toString() + this.BLOCKS_PER_SECTOR.toString();
+    var key = this.TRACK_COUNT.toString() + this.SECTOR_COUNT.toString() + this.BLOCK_COUNT.toString();
     
     this.MAX_TSB_KEY = parseInt(key);
     
@@ -44,17 +52,24 @@ DeviceDriverFileSystem.prototype.format = function()
 {
     this.hardDisk.clear();
     
-    for (var i=0; i <= this.MAX_TSB_KEY; i++)
+    for (var track=0; track <= this.TRACK_COUNT; track++)
     {
-        var tsbKey = this.convertToTSBKey(i);
-        
-        var dataValue = this.blockAsString(0, -1, -1, -1, '');
-        
-        this.hardDisk.setItem(tsbKey, dataValue);
+        for (var sector=0; sector <= this.SECTOR_COUNT; sector++)
+        {
+            for (var block=0; block <= this.BLOCK_COUNT; block++)
+            {
+                var tsbKey = track.toString() + sector.toString() + block.toString();
+
+                var dataValue = this.blockAsString(0, -1, -1, -1, '');
+
+                this.hardDisk.setItem(tsbKey, dataValue);
+            }
+        }
     }
     
     // Set up the MBR block.
-    this.writeDataToTSB(0, 0, 0, "MBR");
+    // TODO: use MBR constant
+    //this.writeDataToTSB(0, 0, 0, "MBR");
 };
 
 /**
@@ -89,6 +104,13 @@ DeviceDriverFileSystem.prototype.blockAsString = function(isBlockOccupied, track
     return JSON.stringify(blockDataAsArray);
 };
 
+/**
+ * 
+ * @param {type} track The track.
+ * @param {type} sector The sector.
+ * @param {type} block The block.
+ * @returns {string} The data contained in that block
+ */
 DeviceDriverFileSystem.prototype.readTSB = function(track, sector, block)
 {
     return this.hardDisk.getItem(this.convertToTSBKey(track, sector, block));
@@ -102,7 +124,7 @@ DeviceDriverFileSystem.prototype.readTSB = function(track, sector, block)
  * @param {type} data The data to write to the TSB.
  * @returns {undefined}
  */
-DeviceDriverFileSystem.prototype.writeDataToTSB = function(track, sector, block, data)
+DeviceDriverFileSystem.prototype.writeDataToTSB = function(tsbKey, isOccupied, tsbLink, data)
 {
     if (data.length > this.MAX_DATA_SIZE_IN_BYTES)
     {
@@ -110,19 +132,63 @@ DeviceDriverFileSystem.prototype.writeDataToTSB = function(track, sector, block,
     }
     
     var blockAsString = this.blockAsString(1, -1, -1, -1, this.dataWithPadding(data));
-    this.hardDisk.setItem(this.convertToTSBKey(track, sector, block), blockAsString);
+    this.hardDisk.setItem(tsbKey, blockAsString);
 };
 
 
-DeviceDriverFileSystem.prototype.deleteFile = function()
+DeviceDriverFileSystem.prototype.writeDataToFile = function(fileName, data)
 {
     
 };
 
-
-DeviceDriverFileSystem.prototype.createNewFile = function(track, sector, block, fileName, data)
+/**
+ * Deletes the specified file.
+ * @param {type} fileName The file to delete.
+ * @returns {Boolean} Whether or not the process was successful or not.
+ */
+DeviceDriverFileSystem.prototype.deleteFile = function(fileName)
 {
+    var wasSuccessful = false;
     
+    return wasSuccessful;
+};
+
+/**
+ * Creates a new file.
+ * @param {type} fileName The name of the file to create.
+ * @returns {Boolean} Whether or not the process was successful or not.
+ */
+DeviceDriverFileSystem.prototype.createNewFile = function(fileName)
+{
+    var result = false;
+    
+    
+    
+    var nextOpenBlockTSBKey = this.obtainNextOpenBlock();
+    
+    if (fileName.length > this.MAX_DATA_SIZE_IN_BYTES)
+    {
+        result = "The specified filename is too long. Max length is " + this.MAX_DATA_SIZE_IN_BYTES + " characters.";
+    }/*
+    else if(!nextOpenBlockTSBKey)
+    {
+        result;
+    }
+    else if ()
+    {
+
+    }*/
+    
+    this.writeDataToTSB(nextOpenBlockTSBKey, "");
+    
+    return result;
+};
+
+DeviceDriverFileSystem.prototype.obtainNextOpenBlock = function ()
+{
+    var nextBlock;
+    
+    return nextBlock;
 };
 
 /**
