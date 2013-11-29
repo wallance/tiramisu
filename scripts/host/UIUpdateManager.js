@@ -194,10 +194,7 @@ UIUpdateManager.baseTenToBaseSixteen = function(baseTen, shouldPrependNotation)
  * @returns {undefined}
  */
 UIUpdateManager.initalizeFileSystemMonitor = function ()
-{
-    // Holds all the row elements
-    var tableBody = $('<tbody>');
-    
+{    
     // Each row has eight "blocks"
     for (var i = 0; i < krnFileSystemDriver.hardDisk.length; i++) {
         
@@ -215,7 +212,6 @@ UIUpdateManager.initalizeFileSystemMonitor = function ()
         
         $(tableRow).appendTo($('#file-system-monitor table tbody'));
     }
-    
 };
 
 UIUpdateManager.updateFileSystemMonitorAtTSB = function(tsbKey)
