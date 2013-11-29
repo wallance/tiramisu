@@ -218,8 +218,15 @@ UIUpdateManager.initalizeFileSystemMonitor = function ()
     
 };
 
-UIUpdateManager.updateFileSystemMonitorAtTSB = function(track, sector, block)
+UIUpdateManager.updateFileSystemMonitorAtTSB = function(tsbKey)
 {
     krnFileSystemDriver.readTSB(track, sector, block);
+    
+    tsbKey = tsbKey.split();
+    var track = tsbKey[0];
+    var sector = tsbKey[1];
+    var block = tsbKey[2];
+    
+    $('#tsb-key-' + tsbKey).html(krnFileSystemDriver.readTSB(track, sector, block))
     
 };
