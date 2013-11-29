@@ -69,7 +69,7 @@ DeviceDriverFileSystem.prototype.format = function()
     
     // Set up the MBR block.
     // TODO: use MBR constant
-    //this.writeDataToTSB(0, 0, 0, "MBR");
+    this.writeDataToTSB("000", false, null, "MBR");
 };
 
 /**
@@ -131,7 +131,16 @@ DeviceDriverFileSystem.prototype.writeDataToTSB = function(tsbKey, isOccupied, t
         throw 'Error writing data to the TSB.  Attempted to write data that exceeds the block size.';
     }
     
-    var blockAsString = this.blockAsString(1, -1, -1, -1, this.dataWithPadding(data));
+    if (tsbLink === null) {  };
+    
+    var occupiedByte = 0;
+    
+    if (isOccupied)
+    {
+        occupiedByte = 1;
+    };
+    
+    var blockAsString = this.blockAsString(occupiedByte, -1, -1, -1, this.dataWithPadding(data));
     this.hardDisk.setItem(tsbKey, blockAsString);
 };
 
@@ -162,34 +171,64 @@ DeviceDriverFileSystem.prototype.createNewFile = function(fileName)
 {
     var result = false;
     
-    
-    
+    var nextOpenMFTBlock = this.obtainNextOpenMFTBlock();
     var nextOpenBlockTSBKey = this.obtainNextOpenBlock();
     
     if (fileName.length > this.MAX_DATA_SIZE_IN_BYTES)
     {
         result = "The specified filename is too long. Max length is " + this.MAX_DATA_SIZE_IN_BYTES + " characters.";
-    }/*
+    }
     else if(!nextOpenBlockTSBKey)
     {
-        result;
+        result = "Failed to create new file. The disk is full.";
     }
-    else if ()
+    else if (!nextOpenMFTBlock)
     {
-
-    }*/
+        result = "Can't create new file because the maximum number of files has been reached."
+    }
     
     this.writeDataToTSB(nextOpenBlockTSBKey, "");
     
     return result;
 };
 
-DeviceDriverFileSystem.prototype.obtainNextOpenBlock = function ()
+/**
+ * Determines the next open block in the file data section of the disk.
+ * @returns {String} Returns the TSB Key or null if there is none.
+ */
+DeviceDriverFileSystem.prototype.obtainNextOpenFileDataBlock = function ()
 {
-    var nextBlock;
-    
-    return nextBlock;
+    return this.obtainNextOpenBlockWithinBounds(100, 377);
 };
+
+/**
+ * Determines the next open block in the Master File Table (MFT).
+ * @returns {String} Returns the TSB Key or null if there is none.
+ */
+DeviceDriverFileSystem.prototype.obtainNextOpenMFTBlock = function ()
+{
+    return this.obtainNextOpenBlockWithinBounds(1, 77);
+}
+
+DeviceDriverFileSystem.prototype.obtainNextOpenBlockWithinBounds = function (baseTSB, limitTSB)
+{
+    var nextOpenBlock = null;
+    
+    for (var i=baseTSB; i <= limitTSB; i++)
+    {
+        var tsbKey = this.convertToTSBKey(i);
+        var tsbValue = this.readTSB(tsbKey);
+        var tsbValueAsArray = JSON.parse(tsbValue);
+        
+        if (parseInt(tsbValueAsArray[0]) === 1)
+        {
+            // Found the next open block!
+            nextOpenBlock = tsbKey;
+        }
+    }
+    // No open block found!
+    return nextOpenBlock;
+}
 
 /**
  * Fills the empty space of the block with hyphens.
