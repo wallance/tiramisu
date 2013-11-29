@@ -171,7 +171,7 @@ DeviceDriverFileSystem.prototype.createNewFile = function(fileName)
 {
     var result = false;
     
-    var nextOpenMFTBlock = this.obtainNextOpenMFTBlock();
+    var nextOpenMFTBlockKey = this.obtainNextOpenMFTBlock();
     var nextOpenBlockTSBKey = this.obtainNextOpenBlock();
     
     if (fileName.length > this.MAX_DATA_SIZE_IN_BYTES)
@@ -182,12 +182,20 @@ DeviceDriverFileSystem.prototype.createNewFile = function(fileName)
     {
         result = "Failed to create new file. The disk is full.";
     }
-    else if (!nextOpenMFTBlock)
+    else if (!nextOpenMFTBlockKey)
     {
         result = "Can't create new file because the maximum number of files has been reached."
     }
+    else
+    {
+        // No problems, so actually create the new file.
+        this.writeDataToTSB(nextOpenMFTBlockKey, true, nextOpenBlockTSBKey, fileName)
+        // This writes no data, it will just link the TSB in the MFT block to
+        // the next open data block in the file data section of the hard drive.
+        this.writeDataToTSB(nextOpenBlockTSBKey, "");
+    }
     
-    this.writeDataToTSB(nextOpenBlockTSBKey, "");
+    
     
     return result;
 };
@@ -208,7 +216,7 @@ DeviceDriverFileSystem.prototype.obtainNextOpenFileDataBlock = function ()
 DeviceDriverFileSystem.prototype.obtainNextOpenMFTBlock = function ()
 {
     return this.obtainNextOpenBlockWithinBounds(1, 77);
-}
+};
 
 DeviceDriverFileSystem.prototype.obtainNextOpenBlockWithinBounds = function (baseTSB, limitTSB)
 {
@@ -228,7 +236,7 @@ DeviceDriverFileSystem.prototype.obtainNextOpenBlockWithinBounds = function (bas
     }
     // No open block found!
     return nextOpenBlock;
-}
+};
 
 /**
  * Fills the empty space of the block with hyphens.
