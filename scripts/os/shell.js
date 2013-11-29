@@ -792,7 +792,21 @@ function displayCommandHistory(keyCode)
 
 function  shellCreateFile(args)
 {
+    var fileName = args[0];
     
+    if (!fileName) { _StdIn.putText("A filename was not specified.") };
+    
+    var wasSuccessful = krnFileSystemDriver.createNewFile(fileName);
+    
+    if (wasSuccessful === true)
+    {
+        _StdIn.putText("Successfully created the file " + fileName + ".");
+    }
+    else
+    {
+        krnTrace("Failed to create file. See display for details.");
+        _StdIn.putText(wasSuccessful);
+    }
 }
 
 function shellReadFile(args)
