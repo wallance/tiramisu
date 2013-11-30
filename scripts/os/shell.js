@@ -921,7 +921,8 @@ function shellListFiles()
         // Loop through list of files and display them in the console.
         for (var file in files)
         {
-            _StdIn.putText(file);
+            _StdIn.putText(files[file]);
+            _StdIn.advanceLine();
         }
     }
 }
