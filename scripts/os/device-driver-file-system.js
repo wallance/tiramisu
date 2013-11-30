@@ -120,6 +120,32 @@ DeviceDriverFileSystem.prototype.readTSB = function(track, sector, block)
     return JSON.parse(this.hardDisk.getItem(this.convertToTSBKey(track, sector, block)));
 };
 
+DeviceDriverFileSystem.prototype.readTSBUsingKey = function(tsbKey)
+{
+    return JSON.parse(this.hardDisk.getItem(tsbKey));
+};
+
+DeviceDriverFileSystem.prototype.readFileData = function(fileName)
+{
+    // Check if the file with the name exists.
+    var fileTSBKey = this.findFileTSB(fileName);
+    
+    // Get the start TSB of the file data.
+    var fileStartTSBKey = this.readTSBUsingKey(fileTSBKey);
+    
+    var currentTSBKey = fileStartTSBKey;
+    var fileData = null;
+    
+    while (currentTSBKey !== -1-1-1)
+    {
+        
+        // Get the next TSB key, as specified by the block data.
+        //currentTSBKey = ;
+    }
+    
+    return fileData;
+};
+
 /**
  * 
  * @param {int} track The track number
@@ -170,15 +196,62 @@ DeviceDriverFileSystem.prototype.writeDataToFile = function(fileName, data)
 {
     var wasSuccessful = false;
     
-    var fileStartTSBKey;
+    var fileDirTSBKey = this.findFileTSB(fileName);
     
-    if (fileStartTSBKey)
+    if (fileDirTSBKey)
     {
-        fileStartTSBKey
-    }
+        var fileDirBlockData = this.readTSBUsingKey(fileDirTSBKey);
+
+        var fileStartTSBKey = this.createTSBKey(fileDirBlockData[1], fileDirBlockData[2], fileDirBlockData[3]);
+
+        var requiredNumberOfBlocks = this.calculateRequiredBlocks(data);
+
+        var blockData, currentTSBKey, nextTSBKey = null;
     
+        blockData = data.substring();
+        
+        nextTSBKey = fileStartTSBKey;
+        
+        for (var i=0; i < requiredNumberOfBlocks; i++)
+        {
+            currentTSBKey = nextTSBKey;
+            nextTSBKey = this.obtainNextOpenFileDataBlock();
+            blockData = data.substring(i*60,((i + 1) * 60));
+            this.writeDataToTSB(currentTSBKey, 1, nextTSBKey, blockData);
+        }
+        wasSuccessful = true;
+    }
+    else
+    {
+        wasSuccessful = 'The specified file was not found.';
+    }
     return wasSuccessful;
 };
+
+DeviceDriverFileSystem.prototype.findFileTSB = function(fileName)
+{
+    for (var track=0; track <= 0; track++)
+    {
+        for (var sector=0; sector <= 7; sector++)
+        {
+            for (var block=0; block <= 7; block++)
+            {
+                var tsbKey = this.createTSBKey(track, sector, block);
+                
+                var tsbValueAsArray = this.readTSB(tsbKey);
+                
+                var value = tsbValueAsArray[4].toString();
+                var fileNameFromFileSystem = value.replace(new RegExp("\-+$"), "");
+                
+                if (fileNameFromFileSystem === fileName)
+                {
+                    // Found the file!
+                    return tsbKey;
+                }
+            }
+        }
+    }
+}
 
 /**
  * Determines how many blocks the specified data needs for it to be written.
@@ -267,9 +340,7 @@ DeviceDriverFileSystem.prototype.obtainNextOpenBlockWithinBounds = function (bas
             {
                 var tsbKey = this.createTSBKey(track, sector, block);
                 
-                var tsbValue = this.readTSB(tsbKey);
-                
-                var tsbValueAsArray = JSON.parse(tsbValue);
+                var tsbValueAsArray = this.readTSB(tsbKey);
                 
                 // If it is zero,, it is unoccupied.
                 if (parseInt(tsbValueAsArray[0]) === 0)
