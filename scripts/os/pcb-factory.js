@@ -61,28 +61,52 @@ ProcessControlBlockFactory.prototype.createProcess = function()
         // Where should the new PCB be placed in memory.
         var nextAvailableMemoryBlock = _MemoryManager.getNextAvailableBlock();
         
-        if (nextAvailableMemoryBlock === null)
+        // Determine details about the new PCB.
+        var baseAddress = -1;
+        var limitAddress = -1;
+        var memoryBlockId = -1;
+        
+        if (nextAvailableMemoryBlock !== null)
         {
-            _StdIn.putText("Memory contains three processes. Kill at least one first.");
-            return null;
+            baseAddress = nextAvailableMemoryBlock['baseAddress'];
+            limitAddress = nextAvailableMemoryBlock['limitAddress'];
+            memoryBlockId = nextAvailableMemoryBlock['blockId'];
         }
         
-        _StdIn.putText("Loading the program into memory...");
-        _StdIn.advanceLine();
-        
-        // Determine details about the new PCB.
-        var baseAddress = nextAvailableMemoryBlock['baseAddress'];
-        var limitAddress = nextAvailableMemoryBlock['limitAddress'];
-        var memoryBlockId = nextAvailableMemoryBlock['blockId'];
-        
         var pcb = new ProcessControlBlock(this.obtainNewProcessID(), baseAddress, limitAddress, memoryBlockId);
-        
-        _MemoryManager.setBlockAvailability(memoryBlockId, false);
         
         // Add the new PCB to the list of processes.
         this.residentProcesses[pcb.getProcessID()] = pcb;
         
+        if (nextAvailableMemoryBlock !== null)
+        {
+            // There are open slots in memory.
+            _MemoryManager.setBlockAvailability(memoryBlockId, false);
+            
+            _StdIn.putText("Loading the program into memory...");
+            krnTrace("All memory slots are filled. Loading process into memory.");           
+        }
+        else
+        {
+            // No more open slots in memory, so write it to disk.
+            _StdIn.putText("Loading the program onto disk...");   
+            krnTrace("All memory slots are filled. Loading process onto disk.");
+            
+            pcb.setState("On Disk");
+            
+            var processFileName = this.generateProcessFileName(pcb.getProcessID());
+            
+            krnFileSystemDriver.createNewFile(processFileName);
+        }
+        
+        _StdIn.advanceLine();
+        
         return this.residentProcesses[pcb.getProcessID()];
+};
+
+ProcessControlBlockFactory.prototype.generateProcessFileName = function(processId)
+{
+    return "swapped-process-" + processId.toString();
 };
 
 ProcessControlBlockFactory.prototype.getProcess = function(pid)
