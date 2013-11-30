@@ -154,17 +154,41 @@ DeviceDriverFileSystem.prototype.writeDataToTSB = function(tsbKey, isOccupied, t
     };
     
     var blockAsString = this.blockAsString(occupiedByte, t, s, b, this.dataWithPadding(data));
-    console.log("Hello 1: " + tsbKey + "    " + blockAsString);
+    
     this.hardDisk.setItem(tsbKey, blockAsString);
     // Update the file system display for this TSB.
     UIUpdateManager.updateFileSystemMonitorAtTSB(tsbKey);
 };
 
-
+/**
+ * Writes the specified data to he specified filename.
+ * @param {type} fileName The filename to write the data to.
+ * @param {type} data The data to write to disk.
+ * @returns {Boolean} Whether or not the write was successful or not.
+ */
 DeviceDriverFileSystem.prototype.writeDataToFile = function(fileName, data)
 {
+    var wasSuccessful = false;
     
+    var fileStartTSBKey;
+    
+    if (fileStartTSBKey)
+    {
+        fileStartTSBKey
+    }
+    
+    return wasSuccessful;
 };
+
+/**
+ * Determines how many blocks the specified data needs for it to be written.
+ * @param {type} data The data that needs to be written.
+ * @returns {integer} The number of required blocks
+ */
+DeviceDriverFileSystem.prototype.calculateRequiredBlocks = function(data)
+{
+    return Math.ceil( (data.length / this.MAX_DATA_SIZE_IN_BYTES));
+}
 
 /**
  * Deletes the specified file.
