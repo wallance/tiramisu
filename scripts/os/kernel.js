@@ -277,12 +277,21 @@ function krnLoadProgram(sourceCode) {
     // A great use of regex from: http://stackoverflow.com/questions/6259515/javascript-elegant-way-to-split-string-into-segments-n-characters-long
     var splicedCode = sourceCode.match(/.{1,2}/g);
     
-    // Loads code into memory
-    for (var address=0; address < splicedCode.length; address++) {
-        _MemoryManager.writeDataAtLogicalAddress(address, splicedCode[address], pcb.getProcessID());
+    if (pcb.getState() === "On Disk")
+    {
+        // Load the code onto disk.
+        krnTrace("Writing the program code to disk");
+        var fileName = _PCBFactory.generateProcessFileName(pcb.getProcessID());
+        krnFileSystemDriver.writeDataToFile(fileName, sourceCode);
     }
-    
-    return pcb.getProcessID();
+    else
+    {
+        // Loads code into memory
+        for (var address=0; address < splicedCode.length; address++) {
+            _MemoryManager.writeDataAtLogicalAddress(address, splicedCode[address], pcb.getProcessID());
+        }
+    }
+        return pcb.getProcessID();
 }
 
 /*
