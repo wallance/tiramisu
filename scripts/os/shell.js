@@ -811,7 +811,26 @@ function  shellCreateFile(args)
 
 function shellReadFile(args)
 {
+    var fileName = args[0];
     
+    if (!fileName)
+    {
+        _StdIn.putText("A filename was not specified.");
+        return;
+    };
+    
+    var fileData = krnFileSystemDriver.readFileData(fileName);
+    
+    if (fileData !== null)
+    {
+        // Display the contents of the file to user.
+        _StdIn.putText(fileData);
+    }
+    else
+    {
+        krnTrace("Failed to read file. See display for details.");
+        _StdIn.putText("Failed to read the data from the specified filename");
+    }
 };
 
 function shellWriteFile(args)
@@ -826,7 +845,11 @@ function shellWriteFile(args)
     // to be split into multiple and separate arguments.
     data = data.replace(new RegExp("(^\")|(\"$)", "g"), "");
     
-    if (!fileName) { _StdIn.putText("A filename was not specified.") };
+    if (!fileName)
+    {
+        _StdIn.putText("A filename was not specified.");
+        return;
+    };
     
     var wasSuccessful = krnFileSystemDriver.writeDataToFile(fileName, data);
     
@@ -843,7 +866,27 @@ function shellWriteFile(args)
 
 function shellDeleteFile(args)
 {
+    var fileName = args[0];
     
+    if (!fileName)
+    {
+        _StdIn.putText("A filename was not specified.");
+        return;
+    };
+    
+    var wasSuccessful = krnFileSystemDriver.readFileData(fileName);
+    
+    if (wasSuccessful !== null)
+    {
+        // Display the contents of the file to user.
+        _StdIn.putText(wasSuccessful);
+    }
+    else
+    {
+        krnTrace("Failed to read file. See display for details.");
+        // Failed.  wasSuccessful contains an error message.
+        _StdIn.putText(wasSuccessful);
+    }
 }
 
 function shellFormat()
@@ -867,7 +910,20 @@ function shellFormat()
 
 function shellListFiles()
 {
+    var files = krnFileSystemDriver.listAllFiles();
     
+    if (files.length === 0)
+    {
+        _StdOut.putText("No files have been created yet.");
+    }
+    else
+    {
+        // Loop through list of files and display them in the console.
+        for (var file in files)
+        {
+            _StdIn.putText(file);
+        }
+    }
 }
 
 function shellSetSchedule(args)
@@ -881,6 +937,7 @@ function shellSetSchedule(args)
         else
         {
             _StdIn.putText("Invalid scheduling algorithm.");
+            return;
         }
     }
     else
