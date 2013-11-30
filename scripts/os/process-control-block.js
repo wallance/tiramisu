@@ -16,6 +16,13 @@ function ProcessControlBlock(pid, baseAddress, limitAddress, memoryBlock) {
     this.registerX      = 0;
     this.registerY      = 0;
     this.flagZ          = 0;
+    
+    this.states = {
+        LOADED : "Loaded",
+        READY : "Read",
+        TERMINATED : "Terminated",
+        DISK : 'On Disk',
+    };
 }
 
 /**
