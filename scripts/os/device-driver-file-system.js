@@ -228,13 +228,42 @@ DeviceDriverFileSystem.prototype.writeDataToFile = function(fileName, data)
     return wasSuccessful;
 };
 
+DeviceDriverFileSystem.prototype.listAllFiles = function()
+{
+    var files = new Array();
+    
+    for (var track=0; track <= 0; track++)
+    {
+        for (var sector=0; sector <= 7; sector++)
+        {
+            for (var block=1; block <= 7; block++)
+            {
+                var tsbKey = this.createTSBKey(track, sector, block);
+                
+                var tsbValueAsArray = this.readTSB(tsbKey);
+                
+                var value = tsbValueAsArray[4].toString();
+                
+                var fileNameFromFileSystem = value.replace(new RegExp("\-+$"), "");
+                
+                if (fileNameFromFileSystem.length !== 0)
+                {
+                    files.push(fileNameFromFileSystem);
+                }
+            }
+        }
+    }
+    
+    return files;
+}
+
 DeviceDriverFileSystem.prototype.findFileTSB = function(fileName)
 {
     for (var track=0; track <= 0; track++)
     {
         for (var sector=0; sector <= 7; sector++)
         {
-            for (var block=0; block <= 7; block++)
+            for (var block=1; block <= 7; block++)
             {
                 var tsbKey = this.createTSBKey(track, sector, block);
                 
