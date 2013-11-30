@@ -42,7 +42,6 @@ function krnBootstrap()      // Page 8.
         krnTrace("Loading the file system device driver.");
         krnFileSystemDriver = new DeviceDriverFileSystem();     // Construct it.  TODO: Should that have a _global-style name?
         krnFileSystemDriver.driverEntry();                    // Call the driverEntry() initialization routine.
-        UIUpdateManager.initalizeFileSystemMonitor();
         krnTrace(krnFileSystemDriver.status);
    }
    else
