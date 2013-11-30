@@ -807,16 +807,38 @@ function  shellCreateFile(args)
         krnTrace("Failed to create file. See display for details.");
         _StdIn.putText(wasSuccessful);
     }
-}
+};
 
 function shellReadFile(args)
 {
     
-}
+};
 
 function shellWriteFile(args)
 {
+    var fileName = args[0];
+    var data = args[1];
     
+    if (!data) { _StdIn.putText("No data was specified to be written."); return; };
+    
+    // TODO: Fix the command line argument parsing functionality.
+    // If spaces are used in the quotes, any spaces will cause the string
+    // to be split into multiple and separate arguments.
+    data = data.replace(new RegExp("(^\")|(\"$)", "g"), "");
+    
+    if (!fileName) { _StdIn.putText("A filename was not specified.") };
+    
+    var wasSuccessful = krnFileSystemDriver.writeDataToFile(fileName, data);
+    
+    if (wasSuccessful === true)
+    {
+        _StdIn.putText("Successfully wrote the data to the file " + fileName + ".");
+    }
+    else
+    {
+        krnTrace("Failed to create file. See display for details.");
+        _StdIn.putText(wasSuccessful);
+    }
 }
 
 function shellDeleteFile(args)
