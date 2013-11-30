@@ -21,6 +21,7 @@ function DeviceDriverFileSystem()
     this.MAX_TSB_KEY = null;
     this.MAX_DATA_SIZE_IN_BYTES = this.BLOCK_SIZE_IN_BYTES - this.RESERVED_BYTE_COUNT;
     this.MBR_TSB_KEY = this.convertToTSBKey(0);
+    this.NULL_LINK_TSB = "-1-1-1";
     
     // Master File Table (MFT) constants
     this.MFT_START_TSB_KEY = this.convertToTSBKey(1);
@@ -136,13 +137,12 @@ DeviceDriverFileSystem.prototype.readFileData = function(fileName)
     var currentTSBKey = fileStartTSBKey;
     var fileData = null;
     
-    while (currentTSBKey !== -1-1-1)
+    while (currentTSBKey !== this.NULL_LINK_TSB)
     {
         
         // Get the next TSB key, as specified by the block data.
         //currentTSBKey = ;
     }
-    
     return fileData;
 };
 
@@ -216,6 +216,14 @@ DeviceDriverFileSystem.prototype.writeDataToFile = function(fileName, data)
         {
             currentTSBKey = nextTSBKey;
             nextTSBKey = this.obtainNextOpenFileDataBlock();
+            
+            // Fixes the issue of having the last block link to the next block,
+            // when it isn't actually linked.
+            if ( (i+1) === requiredNumberOfBlocks)
+            {
+                nextTSBKey = null;
+            }
+            
             blockData = data.substring(i*60,((i + 1) * 60));
             this.writeDataToTSB(currentTSBKey, 1, nextTSBKey, blockData);
         }
