@@ -59,17 +59,17 @@ DeviceDriverFileSystem.prototype.format = function()
             for (var block=0; block <= this.BLOCK_COUNT; block++)
             {
                 var tsbKey = track.toString() + sector.toString() + block.toString();
-
-                var dataValue = this.blockAsString(0, -1, -1, -1, '');
-
-                this.hardDisk.setItem(tsbKey, dataValue);
+                
+                this.writeDataToTSB(tsbKey, false, null, '');
             }
         }
     }
     
+    UIUpdateManager.initalizeFileSystemMonitor();
+    
     // Set up the MBR block.
     // TODO: use MBR constant
-    this.writeDataToTSB("000", false, null, "MBR");
+    this.writeDataToTSB("000", true, null, "MBR");
 };
 
 /**
@@ -86,6 +86,10 @@ DeviceDriverFileSystem.prototype.convertToTSBKey = function(i) {
         return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
     };
     return padKey(i, 3);
+};
+
+DeviceDriverFileSystem.prototype.createTSBKey = function(track, sector, block) {
+    return track.toString() + sector.toString() + block.toString();
 };
 
 /**
@@ -113,7 +117,7 @@ DeviceDriverFileSystem.prototype.blockAsString = function(isBlockOccupied, track
  */
 DeviceDriverFileSystem.prototype.readTSB = function(track, sector, block)
 {
-    return this.hardDisk.getItem(this.convertToTSBKey(track, sector, block));
+    return JSON.parse(this.hardDisk.getItem(this.convertToTSBKey(track, sector, block)));
 };
 
 /**
@@ -131,7 +135,16 @@ DeviceDriverFileSystem.prototype.writeDataToTSB = function(tsbKey, isOccupied, t
         throw 'Error writing data to the TSB.  Attempted to write data that exceeds the block size.';
     }
     
-    if (tsbLink === null) {  };
+    var t = -1;
+    var s = -1;
+    var b = -1;
+    if (tsbLink !== null)
+    {
+        var tsbParts = tsbLink.split();
+        t = parseInt(tsbLink[0]);
+        s = parseInt(tsbLink[1]);
+        b = parseInt(tsbLink[2]);
+    };
     
     var occupiedByte = 0;
     
@@ -140,8 +153,11 @@ DeviceDriverFileSystem.prototype.writeDataToTSB = function(tsbKey, isOccupied, t
         occupiedByte = 1;
     };
     
-    var blockAsString = this.blockAsString(occupiedByte, -1, -1, -1, this.dataWithPadding(data));
+    var blockAsString = this.blockAsString(occupiedByte, t, s, b, this.dataWithPadding(data));
+    console.log("Hello 1: " + tsbKey + "    " + blockAsString);
     this.hardDisk.setItem(tsbKey, blockAsString);
+    // Update the file system display for this TSB.
+    UIUpdateManager.updateFileSystemMonitorAtTSB(tsbKey);
 };
 
 
@@ -172,7 +188,7 @@ DeviceDriverFileSystem.prototype.createNewFile = function(fileName)
     var result = false;
     
     var nextOpenMFTBlockKey = this.obtainNextOpenMFTBlock();
-    var nextOpenBlockTSBKey = this.obtainNextOpenBlock();
+    var nextOpenBlockTSBKey = this.obtainNextOpenFileDataBlock();
     
     if (fileName.length > this.MAX_DATA_SIZE_IN_BYTES)
     {
@@ -192,11 +208,8 @@ DeviceDriverFileSystem.prototype.createNewFile = function(fileName)
         this.writeDataToTSB(nextOpenMFTBlockKey, true, nextOpenBlockTSBKey, fileName)
         // This writes no data, it will just link the TSB in the MFT block to
         // the next open data block in the file data section of the hard drive.
-        this.writeDataToTSB(nextOpenBlockTSBKey, "");
-    }
-    
-    
-    
+        this.writeDataToTSB(nextOpenBlockTSBKey, true, null, "");
+    }    
     return result;
 };
 
@@ -206,7 +219,7 @@ DeviceDriverFileSystem.prototype.createNewFile = function(fileName)
  */
 DeviceDriverFileSystem.prototype.obtainNextOpenFileDataBlock = function ()
 {
-    return this.obtainNextOpenBlockWithinBounds(100, 377);
+    return this.obtainNextOpenBlockWithinBounds(1, 0, 0, 3, 7, 7);
 };
 
 /**
@@ -215,23 +228,34 @@ DeviceDriverFileSystem.prototype.obtainNextOpenFileDataBlock = function ()
  */
 DeviceDriverFileSystem.prototype.obtainNextOpenMFTBlock = function ()
 {
-    return this.obtainNextOpenBlockWithinBounds(1, 77);
+    return this.obtainNextOpenBlockWithinBounds(0, 0, 1, 0, 7, 7);
 };
 
-DeviceDriverFileSystem.prototype.obtainNextOpenBlockWithinBounds = function (baseTSB, limitTSB)
+DeviceDriverFileSystem.prototype.obtainNextOpenBlockWithinBounds = function (baseTrack, baseSector, baseBlock, limitTrack, limitSector, limitBlock)
 {
     var nextOpenBlock = null;
     
-    for (var i=baseTSB; i <= limitTSB; i++)
+    for (var track=baseTrack; track <= limitTrack; track++)
     {
-        var tsbKey = this.convertToTSBKey(i);
-        var tsbValue = this.readTSB(tsbKey);
-        var tsbValueAsArray = JSON.parse(tsbValue);
-        
-        if (parseInt(tsbValueAsArray[0]) === 1)
+        for (var sector=baseSector; sector <= limitSector; sector++)
         {
-            // Found the next open block!
-            nextOpenBlock = tsbKey;
+            for (var block=baseBlock; block <= limitBlock; block++)
+            {
+                var tsbKey = this.createTSBKey(track, sector, block);
+                
+                var tsbValue = this.readTSB(tsbKey);
+                
+                var tsbValueAsArray = JSON.parse(tsbValue);
+                
+                // If it is zero,, it is unoccupied.
+                if (parseInt(tsbValueAsArray[0]) === 0)
+                {
+                    // Found the next open block!
+                    nextOpenBlock = tsbKey;
+                    
+                    return nextOpenBlock;
+                }
+            }
         }
     }
     // No open block found!
