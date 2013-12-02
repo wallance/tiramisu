@@ -186,6 +186,13 @@ DeviceDriverFileSystem.prototype.writeDataToTSB = function(tsbKey, isOccupied, t
     UIUpdateManager.updateFileSystemMonitorAtTSB(tsbKey);
 };
 
+DeviceDriverFileSystem.prototype.getTSBLinkOfKey = function (tsbKey)
+{
+    var valueOfTSBKey = this.readTSBUsingKey(tsbKey);
+
+    return this.createTSBKey(valueOfTSBKey[1], valueOfTSBKey[2], valueOfTSBKey[3]);
+};
+
 /**
  * Writes the specified data to he specified filename.
  * @param {type} fileName The filename to write the data to.
@@ -200,9 +207,7 @@ DeviceDriverFileSystem.prototype.writeDataToFile = function(fileName, data)
     
     if (fileDirTSBKey)
     {
-        var fileDirBlockData = this.readTSBUsingKey(fileDirTSBKey);
-
-        var fileStartTSBKey = this.createTSBKey(fileDirBlockData[1], fileDirBlockData[2], fileDirBlockData[3]);
+        var fileStartTSBKey = this.getTSBLinkOfKey(fileDirTSBKey);
 
         var requiredNumberOfBlocks = this.calculateRequiredBlocks(data);
 
@@ -288,6 +293,7 @@ DeviceDriverFileSystem.prototype.findFileTSB = function(fileName)
             }
         }
     }
+    return null;
 }
 
 /**
@@ -308,6 +314,38 @@ DeviceDriverFileSystem.prototype.calculateRequiredBlocks = function(data)
 DeviceDriverFileSystem.prototype.deleteFile = function(fileName)
 {
     var wasSuccessful = false;
+    
+    var fileTSBKey = this.findFileTSB(fileName);
+    
+    if (fileName !== null)
+    {
+        // Get the start TSB of the file data.
+        
+        var fileStartTSBKey = this.getTSBLinkOfKey(fileTSBKey);
+    
+        var currentTSBKey = fileStartTSBKey;
+        
+        // Delete the file data.
+        while (currentTSBKey !== this.NULL_LINK_TSB)
+        {
+            
+            // Get the next TSB key, as specified by the block value.
+            var nextTSBKey = this.getTSBLinkOfKey(currentTSBKey);
+            
+            // blank it all out.
+            this.writeDataToTSB(currentTSBKey, false, null, '');
+            
+            // We finished operaring on the current key, now move to the next one.
+            currentTSBKey = nextTSBKey;
+        }
+        
+        // Now delete the file from the directory data part of the disk.
+        this.writeDataToTSB(fileTSBKey, false, null, '');
+    }
+    else
+    {
+        wasSuccessful = 'The file was not found on disk.';
+    }
     
     return wasSuccessful;
 };
