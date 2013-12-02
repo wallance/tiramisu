@@ -941,7 +941,7 @@ function shellSetSchedule(args)
                 // See: http://stackoverflow.com/questions/307179/what-is-javascripts-max-int-whats-the-highest-integer-value-a-number-can-go-t
                 _RoundRobinQuantum = 9007199254740992; // 2^53
             }
-            elseif (args[0] === 'rr')
+            else if (args[0] === 'rr')
             {
                 _RoundRobinQuantum = ROUND_ROBIN_DEFAULT_QUANTUM;
             }
