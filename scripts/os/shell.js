@@ -934,6 +934,17 @@ function shellSetSchedule(args)
         if (_CPUScheduler.getAlgorithm(args[0]) !== null)
         {
             _SchedulingAlgorithm = args[0];
+            
+            if (args[0] === 'fcfs')
+            {
+                // For FCFS, set the quantum really high
+                // See: http://stackoverflow.com/questions/307179/what-is-javascripts-max-int-whats-the-highest-integer-value-a-number-can-go-t
+                _RoundRobinQuantum = 9007199254740992; // 2^53
+            }
+            elseif (args[0] === 'rr')
+            {
+                _RoundRobinQuantum = ROUND_ROBIN_DEFAULT_QUANTUM;
+            }
         }
         else
         {
