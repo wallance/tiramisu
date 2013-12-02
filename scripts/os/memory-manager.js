@@ -173,3 +173,60 @@ MemoryManager.prototype.parseToHex = function(data) {
     if (hex.length === 1) { hex = '0' + hex; };
     return hex;
 };
+
+/**
+ * Loads the specified process from the hard drive to a slot in physical memory.
+ * @param {type} processId The process that needs to be brought into physical memory.
+ */
+MemoryManager.prototype.swapProcessIn = function(processId)
+{
+    krnTrace("Swapping process " + processId + " from the hard drive to physical memory.");
+    var pcb = _PCBFactory.getProcess(processId);
+    
+    
+};
+
+/**
+ * Writes the specified process from physical memory to the hard drive.
+ * @param {type} pid The process that needs to be written to disk.
+ */
+MemoryManager.prototype.swapProcessOut = function(pid)
+{
+    krnTrace("Swapping process " + pid + " from the physical memory to the hard drive.");
+    
+    var pcb = _PCBFactory.getProcess(pid);
+    
+    var fileName = this.generateProcessFileName(pcb.getProcessID());
+    
+    var processData = this.readProcessData(pid);
+    
+    // Create the swap file for this process.
+    //krnFileSystemDriver.createNewFile(fileName);
+    
+    // Write the contents of the process to disk.
+    //krnFileSystemDriver.writeDataToFile(fileName, processData);
+};
+
+MemoryManager.prototype.readProcessData = function(pid)
+{
+    /*var baseAddress = this.memoryBlocks[blockIndex]['baseAddress'];
+    var limitAddress = this.memoryBlocks[blockIndex]['limitAddress'];
+    
+    var data = null;
+    
+    if ( (baseAddress !== null) && (limitAddress !== null))
+    {
+       ;
+    }*/
+    /*else
+    {*/
+    var data = null;
+    
+    for (var logicalAddress=0; logicalAddress < SYSTEM_MEMORY_BLOCK_SIZE; i++)
+    {
+        data = this.readDataAtLogicalAddress(logicalAddress, pid);
+    }
+    //}
+    
+    return data;
+};
