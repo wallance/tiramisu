@@ -47,7 +47,7 @@ var _CurrentExecutingProcess = null;
 var _CPUScheduler = null;
 var _RoundRobinCycleCount = null;
 var _RoundRobinQuantum = 6;
-var _SchedulingAlgorithm = 'rr';
+var _SchedulingAlgorithm = 'Round Robin';
 
 var _Canvas = null;               // Initialized in hostInit().
 var _DrawingContext = null;       // Initialized in hostInit().
