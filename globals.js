@@ -28,6 +28,9 @@ var SYSTEM_MEMORY_BLOCK_COUNT = 3;
 // Total size of the memory
 var SYSTEM_MEMORY_SIZE = SYSTEM_MEMORY_BLOCK_SIZE * SYSTEM_MEMORY_BLOCK_COUNT;
 
+// Scheduling
+var ROUND_ROBIN_DEFAULT_QUANTUM = 6;
+
 //
 // Global Variables
 //
