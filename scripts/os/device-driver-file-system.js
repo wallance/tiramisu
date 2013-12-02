@@ -126,23 +126,47 @@ DeviceDriverFileSystem.prototype.readTSBUsingKey = function(tsbKey)
     return JSON.parse(this.hardDisk.getItem(tsbKey));
 };
 
+DeviceDriverFileSystem.prototype.readBlockDataAtTSB = function(tsbKey)
+{
+    var tsbContents = this.readTSBUsingKey(tsbKey);
+    
+    // Be sure to remove any padding hyphens only at the end of the data.
+    return tsbContents[4].replace(new RegExp("\-+$"), "");;
+};
+
 DeviceDriverFileSystem.prototype.readFileData = function(fileName)
 {
-    // Check if the file with the name exists.
+    var fileData = "";
+    
     var fileTSBKey = this.findFileTSB(fileName);
     
-    // Get the start TSB of the file data.
-    var fileStartTSBKey = this.readTSBUsingKey(fileTSBKey);
-    
-    var currentTSBKey = fileStartTSBKey;
-    var fileData = null;
-    
-    while (currentTSBKey !== this.NULL_LINK_TSB)
+    if (fileName !== null)
     {
+        // Get the start TSB of the file data.
         
-        // Get the next TSB key, as specified by the block data.
-        //currentTSBKey = ;
+        var fileStartTSBKey = this.getTSBLinkOfKey(fileTSBKey);
+    
+        var currentTSBKey = fileStartTSBKey;
+        
+        // Delete the file data.
+        while (currentTSBKey !== this.NULL_LINK_TSB)
+        {
+            
+            // Get the next TSB key, as specified by the block value.
+            var nextTSBKey = this.getTSBLinkOfKey(currentTSBKey);
+            
+            // Read the data from the current TSB.
+            fileData += this.readBlockDataAtTSB(currentTSBKey);
+            
+            // We finished operaring on the current key, now move to the next one.
+            currentTSBKey = nextTSBKey;
+        }
     }
+    else
+    {
+       return null;
+    }
+    
     return fileData;
 };
 
@@ -164,6 +188,7 @@ DeviceDriverFileSystem.prototype.writeDataToTSB = function(tsbKey, isOccupied, t
     var t = -1;
     var s = -1;
     var b = -1;
+    
     if (tsbLink !== null)
     {
         var tsbParts = tsbLink.split();
@@ -186,6 +211,12 @@ DeviceDriverFileSystem.prototype.writeDataToTSB = function(tsbKey, isOccupied, t
     UIUpdateManager.updateFileSystemMonitorAtTSB(tsbKey);
 };
 
+/**
+ * Returns the value of the TSB key (the link) that is stored at the specified
+ * TSB key.
+ * @param {type} tsbKey the key to read from.
+ * @returns {String} The stored TSB key.
+ */
 DeviceDriverFileSystem.prototype.getTSBLinkOfKey = function (tsbKey)
 {
     var valueOfTSBKey = this.readTSBUsingKey(tsbKey);
@@ -332,7 +363,7 @@ DeviceDriverFileSystem.prototype.deleteFile = function(fileName)
             // Get the next TSB key, as specified by the block value.
             var nextTSBKey = this.getTSBLinkOfKey(currentTSBKey);
             
-            // blank it all out.
+            // Blank it all out.
             this.writeDataToTSB(currentTSBKey, false, null, '');
             
             // We finished operaring on the current key, now move to the next one.
