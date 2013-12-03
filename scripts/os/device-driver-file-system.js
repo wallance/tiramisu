@@ -89,6 +89,13 @@ DeviceDriverFileSystem.prototype.convertToTSBKey = function(i) {
     return padKey(i, 3);
 };
 
+/**
+ * Creates a TSB key from the three parameters.
+ * @param {type} track The track.
+ * @param {type} sector The sector.
+ * @param {type} block The block of data.
+ * @returns {String}
+ */
 DeviceDriverFileSystem.prototype.createTSBKey = function(track, sector, block) {
     return track.toString() + sector.toString() + block.toString();
 };
@@ -110,7 +117,7 @@ DeviceDriverFileSystem.prototype.blockAsString = function(isBlockOccupied, track
 };
 
 /**
- * 
+ * Retrieves an array of all the parts of the specified block.
  * @param {type} track The track.
  * @param {type} sector The sector.
  * @param {type} block The block.
@@ -171,12 +178,11 @@ DeviceDriverFileSystem.prototype.readFileData = function(fileName)
 };
 
 /**
- * 
- * @param {int} track The track number
- * @param {int} sector The sector number
- * @param {int} block The block number
+ * Writes the specified data and to the TSB.
+ * @param {int} tsbKey The TSB key to write the data to.
+ * @param {int} isOccupied The occupied byte.
+ * @param {int} tsbLink The TSB key this block links to.
  * @param {type} data The data to write to the TSB.
- * @returns {undefined}
  */
 DeviceDriverFileSystem.prototype.writeDataToTSB = function(tsbKey, isOccupied, tsbLink, data)
 {
@@ -211,6 +217,11 @@ DeviceDriverFileSystem.prototype.writeDataToTSB = function(tsbKey, isOccupied, t
     UIUpdateManager.updateFileSystemMonitorAtTSB(tsbKey);
 };
 
+/**
+ * Changes only the occupied byte of the specified TSB Key.
+ * @param {type} tsbKey The TSB to modify.
+ * @param {type} isOccupied Specifies the value to set the byte.
+ */
 DeviceDriverFileSystem.prototype.setOccupiedByte = function(tsbKey, isOccupied)
 {
     // Returns a parsed JS array.
@@ -289,6 +300,10 @@ DeviceDriverFileSystem.prototype.writeDataToFile = function(fileName, data)
     return wasSuccessful;
 };
 
+/**
+ * Retrieves a list of all the files on the hard drive.
+ * @returns {Object} The list of files that were found.
+ */
 DeviceDriverFileSystem.prototype.listAllFiles = function()
 {
     var files = new Array();
@@ -318,6 +333,12 @@ DeviceDriverFileSystem.prototype.listAllFiles = function()
     return files;
 }
 
+/**
+ * Locates the directory TSB which contains the TSB link to the first TSB of
+ * the filename.
+ * @param {type} fileName The name of the file to locate.
+ * @returns {String} The TSB key
+ */
 DeviceDriverFileSystem.prototype.findFileTSB = function(fileName)
 {
     for (var track=0; track <= 0; track++)
@@ -451,6 +472,16 @@ DeviceDriverFileSystem.prototype.obtainNextOpenMFTBlock = function ()
     return this.obtainNextOpenBlockWithinBounds(0, 0, 1, 0, 7, 7);
 };
 
+/**
+ * Retrieves the next open TSB within the specified block.
+ * @param {type} baseTrack The starting tack.
+ * @param {type} baseSector The starting sector.
+ * @param {type} baseBlock The starting block.
+ * @param {type} limitTrack The ending track.
+ * @param {type} limitSector The ending sector.
+ * @param {type} limitBlock The ending block.
+ * @returns {String} The TSB Key of the next available block.
+ */
 DeviceDriverFileSystem.prototype.obtainNextOpenBlockWithinBounds = function (baseTrack, baseSector, baseBlock, limitTrack, limitSector, limitBlock)
 {
     var nextOpenBlock = null;
