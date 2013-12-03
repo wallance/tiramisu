@@ -104,3 +104,7 @@ ProcessControlBlock.prototype.setProgramCounter = function(pc) {
 ProcessControlBlock.prototype.setState = function(state) {
     this.state = state;
 };
+
+ProcessControlBlock.prototype.setMemoryBlock = function(block) {
+    this.memoryBlock = block;
+};
