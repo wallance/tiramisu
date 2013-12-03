@@ -71,6 +71,8 @@ DeviceDriverFileSystem.prototype.format = function()
     // Set up the MBR block.
     // TODO: use MBR constant
     this.writeDataToTSB("000", true, null, "MBR");
+    
+    return true;
 };
 
 /**
@@ -410,6 +412,8 @@ DeviceDriverFileSystem.prototype.deleteFile = function(fileName)
         
         // Now delete the file from the directory data part of the disk.
         this.writeDataToTSB(fileTSBKey, false, null, '');
+        
+        wasSuccessful = true;
     }
     else
     {
@@ -450,6 +454,8 @@ DeviceDriverFileSystem.prototype.createNewFile = function(fileName)
         // This writes no data, it will just link the TSB in the MFT block to
         // the next open data block in the file data section of the hard drive.
         this.writeDataToTSB(nextOpenBlockTSBKey, true, null, "");
+        
+        result = true;
     }    
     return result;
 };
