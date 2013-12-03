@@ -147,11 +147,11 @@ DeviceDriverFileSystem.prototype.readFileData = function(fileName)
         var fileStartTSBKey = this.getTSBLinkOfKey(fileTSBKey);
     
         var currentTSBKey = fileStartTSBKey;
-        
+        var i = 0;
         // Delete the file data.
         while (currentTSBKey !== this.NULL_LINK_TSB)
         {
-            
+            i++;
             // Get the next TSB key, as specified by the block value.
             var nextTSBKey = this.getTSBLinkOfKey(currentTSBKey);
             
@@ -211,6 +211,19 @@ DeviceDriverFileSystem.prototype.writeDataToTSB = function(tsbKey, isOccupied, t
     UIUpdateManager.updateFileSystemMonitorAtTSB(tsbKey);
 };
 
+DeviceDriverFileSystem.prototype.setOccupiedByte = function(tsbKey, isOccupied)
+{
+    // Returns a parsed JS array.
+    var blockValue = this.readTSBUsingKey(tsbKey);
+   
+    // Change the occupied byte
+    blockValue[0] = isOccupied;
+    console.log(JSON.stringify(blockValue));
+    this.hardDisk.setItem(tsbKey, JSON.stringify(blockValue));
+    // Update the file system display for this TSB.
+    UIUpdateManager.updateFileSystemMonitorAtTSB(tsbKey);
+};
+
 /**
  * Returns the value of the TSB key (the link) that is stored at the specified
  * TSB key.
@@ -243,15 +256,11 @@ DeviceDriverFileSystem.prototype.writeDataToFile = function(fileName, data)
         var requiredNumberOfBlocks = this.calculateRequiredBlocks(data);
 
         var blockData, currentTSBKey, nextTSBKey = null;
-    
-        blockData = data.substring();
         
-        nextTSBKey = fileStartTSBKey;
+        currentTSBKey = fileStartTSBKey;
         
         for (var i=0; i < requiredNumberOfBlocks; i++)
         {
-            currentTSBKey = nextTSBKey;
-            nextTSBKey = this.obtainNextOpenFileDataBlock();
             
             // Fixes the issue of having the last block link to the next block,
             // when it isn't actually linked.
@@ -259,9 +268,17 @@ DeviceDriverFileSystem.prototype.writeDataToFile = function(fileName, data)
             {
                 nextTSBKey = null;
             }
+            else
+            {
+                nextTSBKey = this.obtainNextOpenFileDataBlock();
+                this.setOccupiedByte(nextTSBKey, 1);
+            }
             
-            blockData = data.substring(i*60,((i + 1) * 60));
+            blockData = data.substring((i * 60), ((i + 1) *60));
+            
             this.writeDataToTSB(currentTSBKey, 1, nextTSBKey, blockData);
+            
+            currentTSBKey = nextTSBKey;
         }
         wasSuccessful = true;
     }
@@ -446,7 +463,7 @@ DeviceDriverFileSystem.prototype.obtainNextOpenBlockWithinBounds = function (bas
             {
                 var tsbKey = this.createTSBKey(track, sector, block);
                 
-                var tsbValueAsArray = this.readTSB(tsbKey);
+                var tsbValueAsArray = this.readTSBUsingKey(tsbKey);
                 
                 // If it is zero,, it is unoccupied.
                 if (parseInt(tsbValueAsArray[0]) === 0)
