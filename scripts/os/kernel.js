@@ -258,9 +258,41 @@ function krnTrapError(msg)
  * 
  * Note: Code must be validated before calling this method.
  */
-function krnLoadProgram(sourceCode) {    
+function krnLoadProgram(sourceCode, existingProcessId) {    
     
-    var pcb = _PCBFactory.createProcess();
+    var pcb = null; 
+    if (existingProcessId === null)
+    {
+        pcb = _PCBFactory.createProcess();
+    }
+    else if (typeof existingProcessId === 'number')
+    {
+        pcb = _PCBFactory.getProcess(existingProcessId);
+        
+        // Where should the new PCB be placed in memory?
+        var nextAvailableMemoryBlock = _MemoryManager.getNextAvailableBlock();
+        
+        // Determine details about the new PCB.
+        var memoryBlockId = -1;
+        
+        if (nextAvailableMemoryBlock !== null)
+        {
+            pcb.setBaseAddress(nextAvailableMemoryBlock['baseAddress']);
+            pcb.setLimitAddress(nextAvailableMemoryBlock['limitAddress']);
+            
+            memoryBlockId = nextAvailableMemoryBlock['blockId'];
+            
+            pcb.setMemoryBlock(memoryBlockId);
+            
+            _MemoryManager.clearMemoryBlock(memoryBlockId);
+            
+            // There are open slots in memory.
+            _MemoryManager.setBlockAvailability(memoryBlockId, false);
+            
+            //krnTrace("All memory slots are filled. Loading process into memory.");         
+        }
+        
+    }
     
     UIUpdateManager.updateProcessMonitor(pcb.getProcessID());
     
