@@ -21,7 +21,7 @@ function ProcessControlBlock(pid, baseAddress, limitAddress, memoryBlock) {
         LOADED : "Loaded",
         READY : "Read",
         TERMINATED : "Terminated",
-        DISK : 'On Disk',
+        DISK : 'On Disk'
     };
 }
 
