@@ -180,10 +180,20 @@ MemoryManager.prototype.parseToHex = function(data) {
  */
 MemoryManager.prototype.swapProcessIn = function(processId)
 {
-    krnTrace("Swapping process " + processId + " from the hard drive to physical memory.");
+    krnTrace("Swapping process " + processId + " from the hard drive to physical memory.");   
     var pcb = _PCBFactory.getProcess(processId);
     
+    var fileName = _PCBFactory.generateProcessFileName(pcb.getProcessID());
     
+    // Read the stored program code.
+    var dataFromDisk = krnFileSystemDriver.readFileData(fileName);
+    
+    pcb.setState("Ready");
+    
+    krnLoadProgram(dataFromDisk, pcb.getProcessID());
+    
+    // Delete the file from virtual memory (the file system)
+    krnFileSystemDriver.deleteFile(fileName);
 };
 
 /**
@@ -196,37 +206,51 @@ MemoryManager.prototype.swapProcessOut = function(pid)
     
     var pcb = _PCBFactory.getProcess(pid);
     
-    var fileName = this.generateProcessFileName(pcb.getProcessID());
+    var fileName = _PCBFactory.generateProcessFileName(pcb.getProcessID());
     
-    var processData = this.readProcessData(pid);
+    var processData = this.readProcessData(pcb.getProcessID());
+    //console.log("------Data length: " +processData.length);
+    
+    //console.log("From Memory: " + processData);
     
     // Create the swap file for this process.
-    //krnFileSystemDriver.createNewFile(fileName);
+    krnFileSystemDriver.createNewFile(fileName);
     
     // Write the contents of the process to disk.
-    //krnFileSystemDriver.writeDataToFile(fileName, processData);
+    krnFileSystemDriver.writeDataToFile(fileName, processData);
+    
+    
+    // Make the memory block available for use.
+    _MemoryManager.clearMemoryBlock(pcb.getMemoryBlock());
+    
+    pcb.setBaseAddress(-1);
+    pcb.setLimitAddress(-1);
+    pcb.setMemoryBlock(-1);
+    pcb.setState('On Disk');    
 };
 
 MemoryManager.prototype.readProcessData = function(pid)
 {
-    /*var baseAddress = this.memoryBlocks[blockIndex]['baseAddress'];
-    var limitAddress = this.memoryBlocks[blockIndex]['limitAddress'];
+    var pcb = _PCBFactory.getProcess(pid);
+    
+    var memoryBlock = pcb.getMemoryBlock();
+    
+    var baseAddress = this.memoryBlocks[memoryBlock]['baseAddress'];
+    var limitAddress = this.memoryBlocks[memoryBlock]['limitAddress'];
     
     var data = null;
     
-    if ( (baseAddress !== null) && (limitAddress !== null))
+    if ( (baseAddress === null) || (limitAddress === null))
     {
-       ;
-    }*/
-    /*else
-    {*/
-    var data = null;
-    
-    for (var logicalAddress=0; logicalAddress < SYSTEM_MEMORY_BLOCK_SIZE; i++)
-    {
-        data = this.readDataAtLogicalAddress(logicalAddress, pid);
+       throw new Error ("Error reading process dasta");
     }
-    //}
+    
+    var data = "";
+    
+    for (var logicalAddress=0; logicalAddress < SYSTEM_MEMORY_BLOCK_SIZE; logicalAddress++)
+    {
+        data += this.readDataAtLogicalAddress(logicalAddress, pcb.getProcessID());
+    }
     
     return data;
 };
