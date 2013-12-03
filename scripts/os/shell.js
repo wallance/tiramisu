@@ -576,7 +576,7 @@ function shellLoadProgram(args)
                 return;
 	};
         
-        var processId = krnLoadProgram(userProgram);
+        var processId = krnLoadProgram(userProgram, null);
         
         if (processId !== null)
         {
@@ -829,7 +829,7 @@ function shellReadFile(args)
     else
     {
         krnTrace("Failed to read file. See display for details.");
-        _StdIn.putText("Failed to read the data from the specified filename");
+        _StdIn.putText("Failed to read the data from the specified filename.");
     }
 };
 
@@ -838,7 +838,7 @@ function shellWriteFile(args)
     var fileName = args[0];
     var data = args[1];
     
-    if (!data) { _StdIn.putText("No data was specified to be written."); return; };
+    if (!data | !fileName) { _StdIn.putText("No data and/or file was specified."); return; };
     
     // TODO: Fix the command line argument parsing functionality.
     // If spaces are used in the quotes, any spaces will cause the string
@@ -874,9 +874,9 @@ function shellDeleteFile(args)
         return;
     };
     
-    var wasSuccessful = krnFileSystemDriver.readFileData(fileName);
+    var wasSuccessful = krnFileSystemDriver.deleteFile(fileName);
     
-    if (wasSuccessful !== null)
+    if (wasSuccessful === true)
     {
         // Display the contents of the file to user.
         _StdIn.putText(wasSuccessful);
