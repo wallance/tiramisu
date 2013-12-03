@@ -80,11 +80,9 @@ Cpu.prototype.getProgramCounterValue = function () {
  * Executes the next instruction, as specified by the program counter.
  */
 Cpu.prototype.executeNextInstruction = function () {
-    
+        
     // Determine next instruction
     var nextInstruction = this.fetchNextInstructionFromMemory();
-    
-    console.log("Process ID: " + _CurrentExecutingProcess + " is executing instruction: " + nextInstruction);
     
     // Determine corresponding method
     var instructionMethod = this.OPERATION_CODES[nextInstruction];
@@ -185,7 +183,7 @@ Cpu.prototype.loadAccumulatorFromMemory = function () {
     }
     
     // Read the data at the determined logical address.
-    this.Acc = _MemoryManager.readDataAtLogicalAddress(logicalAddress, _CurrentExecutingProcess);
+    this.Acc = parseInt(_MemoryManager.readDataAtLogicalAddress(logicalAddress, _CurrentExecutingProcess), 16);
     
     // We are done executing this op code
     this.incrementProgramCounter();
@@ -209,7 +207,7 @@ Cpu.prototype.storeAccumulatorInMemory = function () {
         this.memoryOutOfBoundsAccessHandler();
     }
     
-    _MemoryManager.writeDataAtLogicalAddress(logicalAddress, this.Acc, _CurrentExecutingProcess);
+    _MemoryManager.writeDataAtLogicalAddress(logicalAddress, parseInt(this.Acc,16), _CurrentExecutingProcess);
     
     // We are done executing this op code
     this.incrementProgramCounter();
@@ -280,7 +278,7 @@ Cpu.prototype.loadRegisterXFromMemory = function () {
     }
     
     // Read the data at the determined logical address.
-    this.Xreg = _MemoryManager.readDataAtLogicalAddress(logicalAddress, _CurrentExecutingProcess);
+    this.Xreg = parseInt(_MemoryManager.readDataAtLogicalAddress(logicalAddress, _CurrentExecutingProcess), 16);
     
     // We are done executing this op code
     this.incrementProgramCounter();
@@ -323,7 +321,7 @@ Cpu.prototype.loadRegisterYFromMemory = function () {
     }
     
     // Read the data at the determined logical address.
-    this.Yreg = _MemoryManager.readDataAtLogicalAddress(logicalAddress, _CurrentExecutingProcess);
+    this.Yreg = parseInt(_MemoryManager.readDataAtLogicalAddress(logicalAddress, _CurrentExecutingProcess), 16);
     
     // We are done executing this op code
     this.incrementProgramCounter();
