@@ -221,7 +221,6 @@ UIUpdateManager.initalizeFileSystemMonitor = function ()
 
 UIUpdateManager.updateFileSystemMonitorAtTSB = function(tsbKey)
 {
-    console.log("Called with key: " + tsbKey);
     krnFileSystemDriver.readTSB(track, sector, block);
     
     tsbKey = tsbKey.split();
@@ -230,7 +229,6 @@ UIUpdateManager.updateFileSystemMonitorAtTSB = function(tsbKey)
     var block = tsbKey[2];
     
     var tsbContents = krnFileSystemDriver.readTSB(track, sector, block);
-    console.log(tsbContents[0]);
     
     $('#tsb-key-' + tsbKey + ' td.occupied').html(tsbContents[0]);
     $('#tsb-key-' + tsbKey + ' td.t-link').html(tsbContents[1]);
