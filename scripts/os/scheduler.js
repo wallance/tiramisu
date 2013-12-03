@@ -11,16 +11,19 @@ function Scheduler()
     this.init();
 };
 
+/**
+ * Initalizes the scheduler.
+ */
 Scheduler.prototype.init = function()
 {
     _RoundRobinCycleCount = 1;
 };
 
+/**
+ * The main routine that makes a scheduling decision.
+ */
 Scheduler.prototype.schedule = function()
-{
-    // Retrieve the Process Control Block (PCB).
-    var currentProcess = _PCBFactory.getProcess(_CurrentExecutingProcess);
-    
+{    
     // Executes when there are multiple processes AND the RR cycle count has
     // been reached.
     if ( (_RoundRobinCycleCount > _RoundRobinQuantum) &&
@@ -33,6 +36,10 @@ Scheduler.prototype.schedule = function()
     }
 };
 
+/**
+ * When necessary, the scheduler will switch executing processes.  If the process
+ * is not loaded in memory, prcoess swapping will be handled.
+ */
 Scheduler.prototype.switchContext = function()
 {
     krnTrace("Switching contexts...");
@@ -59,11 +66,36 @@ Scheduler.prototype.switchContext = function()
     }
     
     // Switch processes.
+    var previousProcessId = _CurrentExecutingProcess;
+    
     _CurrentExecutingProcess = _ReadyQueue.dequeue();
     
     krnTrace("Switched process " + currentPCB.getProcessID() + " with " + _CurrentExecutingProcess + ".");
     
     var switchedPCB = _PCBFactory.getProcess(_CurrentExecutingProcess);
+    
+    //console.log("Just Switched PCB " + switchedPCB.getProcessID() + " details... " + "Memory block: " + switchedPCB.getMemoryBlock() +".");
+    
+    // If there is no assigned memory block, that means the process is located
+    // on disk and needs to be swapped in.
+    if (switchedPCB.getMemoryBlock() === -1)
+    {
+        // Sometimes there may be room in physical memory to load the process
+        // which means this will not execute.
+        if ( (_MemoryManager.getNextAvailableBlock() === null) && (_ReadyQueue.getSize() !== 0) )
+        {
+            krnTrace("Swapping process" + previousProcessId + " out from physical memory to the disk.");
+            // If there is no room in physical memory, then we need
+            // to swap a process out of physical memory and onto disk,
+            // before loading in the one that we want.
+            _MemoryManager.swapProcessOut(previousProcessId);
+        }
+        
+        krnTrace("Swapping process" + _CurrentExecutingProcess + " in from from disk to physical memory.");
+        
+        // Read process from disk (virtual memory) and move it into physical memory.
+        _MemoryManager.swapProcessIn(_CurrentExecutingProcess);
+    }
     
     // Each time we switch processes, we must load the base and limit registers.
     _MemoryManager.systemMemory.setBaseRegister(switchedPCB.getBaseAddress());
@@ -85,11 +117,19 @@ Scheduler.prototype.switchContext = function()
     _RoundRobinCycleCount = 1;
 };
 
+/**
+ * Sets the mode.  Use 1 for user mode and 2 for kernel mode.
+ * @param {type} mode The mode to set.
+ */
 Scheduler.prototype.setMode = function(mode)
 {
     _Mode = mode;
 };
 
+/**
+ * Retrieves the name of the algorithm via the specified ID.
+ * @param {type} algorithm The algorithm ID.
+ */
 Scheduler.prototype.getAlgorithm = function(algorithm)
 {
     if (typeof this.algorithms[algorithm] !== 'undefined')
